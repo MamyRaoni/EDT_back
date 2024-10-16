@@ -37,9 +37,9 @@ class Matiere
     private ?Professeur $id_prof = null;
 
     /**
-     * @var Collection<int, parcours>
+     * @var Collection<int, Parcours>
      */
-    #[ORM\ManyToMany(targetEntity: parcours::class, inversedBy: 'matieres')]
+    #[ORM\ManyToMany(targetEntity: Parcours::class, inversedBy: 'matieres')]
     private Collection $id_parcours;
 
     public function __construct()
@@ -137,7 +137,7 @@ class Matiere
     }
 
     /**
-     * @return Collection<int, parcours>
+     * @return Collection<int, Parcours>
      */
     public function getIdParcours(): Collection
     {

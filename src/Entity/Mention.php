@@ -19,9 +19,9 @@ class Mention
     private ?string $libelle_mention = null;
 
     /**
-     * @var Collection<int, parcours>
+     * @var Collection<int, Parcours>
      */
-    #[ORM\OneToMany(targetEntity: parcours::class, mappedBy: 'mention')]
+    #[ORM\OneToMany(targetEntity: Parcours::class, mappedBy: 'mention')]
     private Collection $id_parcours;
 
     public function __construct()
@@ -47,14 +47,14 @@ class Mention
     }
 
     /**
-     * @return Collection<int, parcours>
+     * @return Collection<int, Parcours>
      */
     public function getIdParcours(): Collection
     {
         return $this->id_parcours;
     }
 
-    public function addIdParcour(parcours $idParcour): static
+    public function addIdParcour(Parcours $idParcour): static
     {
         if (!$this->id_parcours->contains($idParcour)) {
             $this->id_parcours->add($idParcour);
@@ -64,7 +64,7 @@ class Mention
         return $this;
     }
 
-    public function removeIdParcour(parcours $idParcour): static
+    public function removeIdParcour(Parcours $idParcour): static
     {
         if ($this->id_parcours->removeElement($idParcour)) {
             // set the owning side to null (unless already changed)
