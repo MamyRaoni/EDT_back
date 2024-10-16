@@ -23,6 +23,7 @@ class ProfController extends AbstractController
     #[Route('/api/prof', name: 'app_prof_create', methods:['POST'])]
     public function createProf(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
+        /* rehefa mandefa anle data de mba atao format json tsara be amzay tsy sahirana ny back XD */
         $prof = $serializer->deserialize($request->getContent(), Professeur::class, 'json');
         $em->persist($prof);
         $em->flush();
