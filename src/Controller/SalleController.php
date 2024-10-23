@@ -16,10 +16,10 @@ class SalleController extends AbstractController
     #[Route('/api/salle', name: 'app_salle', methods:['POST'])]
     public function createSalle(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
-       $salle = $serializer->deserialize($request->getContent(), Salle::class, 'json');
-       $em->persist($salle);
-       $em->flush();
-       return $this->json($salle, 201, [], ['groups' => 'salle']);
+    $salle = $serializer->deserialize($request->getContent(), Salle::class, 'json');
+    $em->persist($salle);
+    $em->flush();
+    return $this->json($salle, 201, [], ['groups' => 'salle']);
     }
     #[Route('/api/salle', name: 'app_salle', methods:['GET'])]
     public function getAllSalle(SalleRepository $salleRepository, SerializerInterface $serializer): JsonResponse
