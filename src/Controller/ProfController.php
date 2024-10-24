@@ -29,4 +29,11 @@ class ProfController extends AbstractController
         $em->flush();
         return $this->json($prof, 201, [], ['groups' => 'prof']);
     }
+    #[Route('/api/prof/{id}', name: 'app_prof_delete', methods:['DELETE'])]
+    public function deleteProf(Professeur $prof, EntityManagerInterface $em): JsonResponse
+    {
+        $em->remove($prof);
+        $em->flush();
+        return $this->json(null, 204);
+    }
 }

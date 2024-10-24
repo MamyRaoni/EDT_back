@@ -28,4 +28,11 @@ class SalleController extends AbstractController
         $json = $serializer->serialize($salle, 'json');
         return new JsonResponse($json, 200, [], true);
     }
+    #[Route('/api/salle/{id}', name: 'app_salle_delete', methods:['DELETE'])]
+    public function deleteSalle(Salle $salle, EntityManagerInterface $em): JsonResponse
+    {
+        $em->remove($salle);
+        $em->flush();
+        return $this->json(null, 204);
+    }
 }
