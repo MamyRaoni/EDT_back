@@ -20,6 +20,12 @@ class ProfController extends AbstractController
             $json = $serializer->serialize($prof, 'json');
             return new JsonResponse($json, 200, [], true);
     }
+    #[Route('/api/prof/{id}', name: 'app_prof_detail', methods:['GET'])]
+    public function getDetailProf(Professeur $prof, SerializerInterface $serializer): JsonResponse
+    {
+        $json = $serializer->serialize($prof, 'json');
+        return new JsonResponse($json, 200, [], true);
+    }
     #[Route('/api/prof', name: 'app_prof_create', methods:['POST'])]
     public function createProf(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
