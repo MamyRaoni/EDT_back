@@ -19,7 +19,7 @@ class ContrainteController extends AbstractController
     public function getAllContrainte(ContrainteRepository $contrainteRepository, SerializerInterface $serializer): JsonResponse
     {
         $contrainte = $contrainteRepository->findAll();
-        $json = $serializer->serialize($contrainte, 'json');
+        $json = $serializer->serialize($contrainte, 'json', ['groups' => 'getProfesseur']);
         return new JsonResponse($json, 200, [], true);
     }
     #[Route('/api/contrainte/{id}', name: 'app_contrainte_delete', methods:['DELETE'])  ]
@@ -38,8 +38,9 @@ class ContrainteController extends AbstractController
         $professeur = $professeurRepository->find($data['professeur']);
         $contrainte->setJour(new \DateTime($data['jour']));
         $contrainte->setProfesseur($professeur);
+        $contrainte->setDisponibilite($data['disponibilite']);
         $em->persist($contrainte);
         $em->flush();
-        return $this->json($contrainte, 201);
+        return $this->json($contrainte, 201,[], ['groups' => 'getProfesseur']);
     }
 }

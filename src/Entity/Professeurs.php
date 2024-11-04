@@ -6,6 +6,7 @@ use App\Repository\ProfesseurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProfesseurRepository::class)]
 class Professeurs
@@ -13,6 +14,7 @@ class Professeurs
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getProfesseur'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -30,7 +32,7 @@ class Professeurs
     /**
      * @var Collection<int, Contraintes>
      */
-    #[ORM\OneToMany(targetEntity: Contraintes::class, mappedBy: 'professeur')]
+    #[ORM\OneToMany(targetEntity: Contraintes::class, mappedBy: 'professeur', cascade: ['persist', 'remove'])]
     private Collection $contraintes;
 
     /**
@@ -44,10 +46,6 @@ class Professeurs
         $this->contraintes = new ArrayCollection();
         $this->matieres = new ArrayCollection();
     }
-
-   
-
-   
 
     public function getId(): ?int
     {
@@ -161,6 +159,4 @@ class Professeurs
 
         return $this;
     }
-
-    
 }

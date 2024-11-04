@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ContrainteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ContrainteRepository::class)]
 class Contraintes
@@ -12,15 +13,19 @@ class Contraintes
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getProfesseur'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::ARRAY)]
+    #[Groups(['getProfesseur'])]
     private array $disponibilite = [];
 
     #[ORM\ManyToOne(inversedBy: 'contraintes')]
+    #[Groups(['getProfesseur'])]
     private ?Professeurs $professeur = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(['getProfesseur'])]
     private ?\DateTimeInterface $jour = null;
 
      public function getId(): ?int

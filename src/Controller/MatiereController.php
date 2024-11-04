@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Matiere;
+use App\Entity\Matieres;
 use App\Repository\ClasseRepository;
 use App\Repository\MatiereRepository;
 use App\Repository\ProfesseurRepository;
@@ -33,7 +34,7 @@ class MatiereController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $classe=$classeRepository->find($data['id_classe']);
         $prof=$professeurRepository->find($data['id_prof']);
-        $matiere =$serializer->deserialize($request->getContent(), Matiere::class, 'json');
+        $matiere =$serializer->deserialize($request->getContent(), Matieres::class, 'json');
         // $matiere->setLibelle($data['libelle']);
         // $matiere->setVolumeHoraire($data['volume_horaire']);
         // $matiere->setVolumeHoraireRestant($data['volume_horaire_restant']);
