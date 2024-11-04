@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Salle;
+use App\Entity\Salles;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,7 +14,7 @@ class SalleRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Salle::class);
+        parent::__construct($registry, Salles::class);
     }
 
     //    /**

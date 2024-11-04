@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Professeur;
+use App\Entity\Professeurs;
 use App\Repository\ProfesseurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +22,7 @@ class ProfController extends AbstractController
             return new JsonResponse($json, 200, [], true);
     }
     #[Route('/api/prof/{id}', name: 'app_prof_detail', methods:['GET'])]
-    public function getDetailProf(Professeur $prof, SerializerInterface $serializer): JsonResponse
+    public function getDetailProf(Professeurs $prof, SerializerInterface $serializer): JsonResponse
     {
         $json = $serializer->serialize($prof, 'json');
         return new JsonResponse($json, 200, [], true);
@@ -30,13 +31,13 @@ class ProfController extends AbstractController
     public function createProf(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         /* rehefa mandefa anle data de mba atao format json tsara be amzay tsy sahirana ny back XD */
-        $prof = $serializer->deserialize($request->getContent(), Professeur::class, 'json');
+        $prof = $serializer->deserialize($request->getContent(), Professeurs::class, 'json');
         $em->persist($prof);
         $em->flush();
         return $this->json($prof, 201, [], ['groups' => 'prof']);
     }
     #[Route('/api/prof/{id}', name: 'app_prof_delete', methods:['DELETE'])]
-    public function deleteProf(Professeur $prof, EntityManagerInterface $em): JsonResponse
+    public function deleteProf(Professeurs $prof, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($prof);
         $em->flush();

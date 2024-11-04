@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MentionRepository::class)]
-class Mention
+class Mentions
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,15 +19,17 @@ class Mention
     private ?string $libelle_mention = null;
 
     /**
-     * @var Collection<int, Parcours>
+     * @var Collection<int, Classes>
      */
-    #[ORM\OneToMany(targetEntity: Parcours::class, mappedBy: 'mention')]
-    private Collection $id_parcours;
+    #[ORM\OneToMany(targetEntity: Classes::class, mappedBy: 'mention')]
+    private Collection $classes;
 
     public function __construct()
     {
-        $this->id_parcours = new ArrayCollection();
+        $this->classes = new ArrayCollection();
     }
+
+    
 
     public function getId(): ?int
     {
@@ -47,32 +49,34 @@ class Mention
     }
 
     /**
-     * @return Collection<int, Parcours>
+     * @return Collection<int, Classes>
      */
-    public function getIdParcours(): Collection
+    public function getClasses(): Collection
     {
-        return $this->id_parcours;
+        return $this->classes;
     }
 
-    public function addIdParcour(Parcours $idParcour): static
+    public function addClass(Classes $class): static
     {
-        if (!$this->id_parcours->contains($idParcour)) {
-            $this->id_parcours->add($idParcour);
-            $idParcour->setMention($this);
+        if (!$this->classes->contains($class)) {
+            $this->classes->add($class);
+            $class->setMention($this);
         }
 
         return $this;
     }
 
-    public function removeIdParcour(Parcours $idParcour): static
+    public function removeClass(Classes $class): static
     {
-        if ($this->id_parcours->removeElement($idParcour)) {
+        if ($this->classes->removeElement($class)) {
             // set the owning side to null (unless already changed)
-            if ($idParcour->getMention() === $this) {
-                $idParcour->setMention(null);
+            if ($class->getMention() === $this) {
+                $class->setMention(null);
             }
         }
 
         return $this;
     }
+
+   
 }

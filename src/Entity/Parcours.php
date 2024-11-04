@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Entity;
-
 use App\Repository\ParcoursRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,25 +18,17 @@ class Parcours
     private ?string $libelle_parcours = null;
 
     /**
-     * @var Collection<int, Matiere>
+     * @var Collection<int, Classes>
      */
-    #[ORM\ManyToMany(targetEntity: Matiere::class, mappedBy: 'id_parcours')]
-    private Collection $matieres;
-
-    #[ORM\ManyToOne(inversedBy: 'id_parcours')]
-    private ?Mention $mention = null;
-
-    /**
-     * @var Collection<int, classe>
-     */
-    #[ORM\ManyToMany(targetEntity: classe::class, inversedBy: 'parcours')]
-    private Collection $id_classe;
+    #[ORM\OneToMany(targetEntity: Classes::class, mappedBy: 'parcour')]
+    private Collection $classes;
 
     public function __construct()
     {
-        $this->matieres = new ArrayCollection();
-        $this->id_classe = new ArrayCollection();
+        $this->classes = new ArrayCollection();
     }
+
+   
 
     public function getId(): ?int
     {
@@ -57,64 +48,31 @@ class Parcours
     }
 
     /**
-     * @return Collection<int, Matiere>
+     * @return Collection<int, Classes>
      */
-    public function getMatieres(): Collection
+    public function getClasses(): Collection
     {
-        return $this->matieres;
+        return $this->classes;
     }
 
-    public function addMatiere(Matiere $matiere): static
+    public function addClass(Classes $class): static
     {
-        if (!$this->matieres->contains($matiere)) {
-            $this->matieres->add($matiere);
-            $matiere->addIdParcour($this);
+        if (!$this->classes->contains($class)) {
+            $this->classes->add($class);
+            $class->setParcour($this);
         }
 
         return $this;
     }
 
-    public function removeMatiere(Matiere $matiere): static
+    public function removeClass(Classes $class): static
     {
-        if ($this->matieres->removeElement($matiere)) {
-            $matiere->removeIdParcour($this);
+        if ($this->classes->removeElement($class)) {
+            // set the owning side to null (unless already changed)
+            if ($class->getParcour() === $this) {
+                $class->setParcour(null);
+            }
         }
-
-        return $this;
-    }
-
-    public function getMention(): ?Mention
-    {
-        return $this->mention;
-    }
-
-    public function setMention(?Mention $mention): static
-    {
-        $this->mention = $mention;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, classe>
-     */
-    public function getIdClasse(): Collection
-    {
-        return $this->id_classe;
-    }
-
-    public function addIdClasse(classe $idClasse): static
-    {
-        if (!$this->id_classe->contains($idClasse)) {
-            $this->id_classe->add($idClasse);
-        }
-
-        return $this;
-    }
-
-    public function removeIdClasse(classe $idClasse): static
-    {
-        $this->id_classe->removeElement($idClasse);
 
         return $this;
     }

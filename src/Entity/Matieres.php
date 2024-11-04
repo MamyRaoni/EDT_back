@@ -3,12 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\MatiereRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MatiereRepository::class)]
-class Matiere
+class Matieres
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -31,21 +29,14 @@ class Matiere
     private ?bool $activation = null;
 
     #[ORM\ManyToOne(inversedBy: 'matieres')]
-    private ?Classe $id_classe = null;
+    private ?Classes $classe = null;
 
     #[ORM\ManyToOne(inversedBy: 'matieres')]
-    private ?Professeur $id_prof = null;
+    private ?Professeurs $professeur = null;
 
-    /**
-     * @var Collection<int, Parcours>
-     */
-    #[ORM\ManyToMany(targetEntity: Parcours::class, inversedBy: 'matieres')]
-    private Collection $id_parcours;
+    
 
-    public function __construct()
-    {
-        $this->id_parcours = new ArrayCollection();
-    }
+    
 
     public function getId(): ?int
     {
@@ -112,51 +103,31 @@ class Matiere
         return $this;
     }
 
-    public function getIdClasse(): ?Classe
+    public function getClasse(): ?Classes
     {
-        return $this->id_classe;
+        return $this->classe;
     }
 
-    public function setIdClasse(?Classe $id_classe): static
+    public function setClasse(?Classes $classe): static
     {
-        $this->id_classe = $id_classe;
+        $this->classe = $classe;
 
         return $this;
     }
 
-    public function getIdProf(): ?Professeur
+    public function getProfesseur(): ?Professeurs
     {
-        return $this->id_prof;
+        return $this->professeur;
     }
 
-    public function setIdProf(?Professeur $id_prof): static
+    public function setProfesseur(?Professeurs $professeur): static
     {
-        $this->id_prof = $id_prof;
+        $this->professeur = $professeur;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Parcours>
-     */
-    public function getIdParcours(): Collection
-    {
-        return $this->id_parcours;
-    }
+    
 
-    public function addIdParcour(parcours $idParcour): static
-    {
-        if (!$this->id_parcours->contains($idParcour)) {
-            $this->id_parcours->add($idParcour);
-        }
-
-        return $this;
-    }
-
-    public function removeIdParcour(parcours $idParcour): static
-    {
-        $this->id_parcours->removeElement($idParcour);
-
-        return $this;
-    }
+    
 }

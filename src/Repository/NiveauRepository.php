@@ -2,40 +2,40 @@
 
 namespace App\Repository;
 
-use App\Entity\Professeur;
-use App\Entity\Professeurs;
+use App\Entity\Niveau;
+use App\Entity\Niveaux;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Professeur>
+ * @extends ServiceEntityRepository<Niveau>
  */
-class ProfesseurRepository extends ServiceEntityRepository
+class NiveauRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Professeurs::class);
+        parent::__construct($registry, Niveaux::class);
     }
 
     //    /**
-    //     * @return Professeur[] Returns an array of Professeur objects
+    //     * @return Niveau[] Returns an array of Niveau objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
+    //        return $this->createQueryBuilder('n')
+    //            ->andWhere('n.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
+    //            ->orderBy('n.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Professeur
+    //    public function findOneBySomeField($value): ?Niveau
     //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
+    //        return $this->createQueryBuilder('n')
+    //            ->andWhere('n.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

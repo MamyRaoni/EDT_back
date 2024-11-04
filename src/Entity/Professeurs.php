@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProfesseurRepository::class)]
-class Professeur
+class Professeurs
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,22 +28,26 @@ class Professeur
     private ?string $contact = null;
 
     /**
-     * @var Collection<int, Matiere>
+     * @var Collection<int, Contraintes>
      */
-    #[ORM\OneToMany(targetEntity: Matiere::class, mappedBy: 'id_prof')]
-    private Collection $matieres;
+    #[ORM\OneToMany(targetEntity: Contraintes::class, mappedBy: 'professeur')]
+    private Collection $contraintes;
 
     /**
-     * @var Collection<int, Contrainte>
+     * @var Collection<int, Matieres>
      */
-    #[ORM\OneToMany(targetEntity: Contrainte::class, mappedBy: 'id_prof')]
-    private Collection $contraintes;
+    #[ORM\OneToMany(targetEntity: Matieres::class, mappedBy: 'professeur')]
+    private Collection $matieres;
 
     public function __construct()
     {
-        $this->matieres = new ArrayCollection();
         $this->contraintes = new ArrayCollection();
+        $this->matieres = new ArrayCollection();
     }
+
+   
+
+   
 
     public function getId(): ?int
     {
@@ -99,29 +103,29 @@ class Professeur
     }
 
     /**
-     * @return Collection<int, Matiere>
+     * @return Collection<int, Contraintes>
      */
-    public function getMatieres(): Collection
+    public function getContraintes(): Collection
     {
-        return $this->matieres;
+        return $this->contraintes;
     }
 
-    public function addMatiere(Matiere $matiere): static
+    public function addContrainte(Contraintes $contrainte): static
     {
-        if (!$this->matieres->contains($matiere)) {
-            $this->matieres->add($matiere);
-            $matiere->setIdProf($this);
+        if (!$this->contraintes->contains($contrainte)) {
+            $this->contraintes->add($contrainte);
+            $contrainte->setProfesseur($this);
         }
 
         return $this;
     }
 
-    public function removeMatiere(Matiere $matiere): static
+    public function removeContrainte(Contraintes $contrainte): static
     {
-        if ($this->matieres->removeElement($matiere)) {
+        if ($this->contraintes->removeElement($contrainte)) {
             // set the owning side to null (unless already changed)
-            if ($matiere->getIdProf() === $this) {
-                $matiere->setIdProf(null);
+            if ($contrainte->getProfesseur() === $this) {
+                $contrainte->setProfesseur(null);
             }
         }
 
@@ -129,32 +133,34 @@ class Professeur
     }
 
     /**
-     * @return Collection<int, Contrainte>
+     * @return Collection<int, Matieres>
      */
-    public function getContraintes(): Collection
+    public function getMatieres(): Collection
     {
-        return $this->contraintes;
+        return $this->matieres;
     }
 
-    public function addContrainte(Contrainte $contrainte): static
+    public function addMatiere(Matieres $matiere): static
     {
-        if (!$this->contraintes->contains($contrainte)) {
-            $this->contraintes->add($contrainte);
-            $contrainte->setIdProf($this);
+        if (!$this->matieres->contains($matiere)) {
+            $this->matieres->add($matiere);
+            $matiere->setProfesseur($this);
         }
 
         return $this;
     }
 
-    public function removeContrainte(Contrainte $contrainte): static
+    public function removeMatiere(Matieres $matiere): static
     {
-        if ($this->contraintes->removeElement($contrainte)) {
+        if ($this->matieres->removeElement($matiere)) {
             // set the owning side to null (unless already changed)
-            if ($contrainte->getIdProf() === $this) {
-                $contrainte->setIdProf(null);
+            if ($matiere->getProfesseur() === $this) {
+                $matiere->setProfesseur(null);
             }
         }
 
         return $this;
     }
+
+    
 }
