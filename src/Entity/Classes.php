@@ -29,13 +29,17 @@ class Classes
     /**
      * @var Collection<int, Matieres>
      */
-    #[ORM\OneToMany(targetEntity: Matieres::class, mappedBy: 'classe')]
+    #[ORM\ManyToMany(targetEntity: Matieres::class, mappedBy: 'classe')]
     private Collection $matieres;
 
     public function __construct()
     {
         $this->matieres = new ArrayCollection();
     }
+
+    
+
+    
 
 
     public function getId(): ?int
@@ -105,7 +109,7 @@ class Classes
     {
         if (!$this->matieres->contains($matiere)) {
             $this->matieres->add($matiere);
-            $matiere->setClasse($this);
+            $matiere->addClasse($this);
         }
 
         return $this;
@@ -114,14 +118,12 @@ class Classes
     public function removeMatiere(Matieres $matiere): static
     {
         if ($this->matieres->removeElement($matiere)) {
-            // set the owning side to null (unless already changed)
-            if ($matiere->getClasse() === $this) {
-                $matiere->setClasse(null);
-            }
+            $matiere->removeClasse($this);
         }
 
         return $this;
     }
+
 
     
 }

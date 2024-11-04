@@ -14,35 +14,21 @@ class Contraintes
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?\DateInterval $semaine = null;
-
     #[ORM\Column(type: Types::ARRAY)]
     private array $dosponibilite = [];
 
     #[ORM\ManyToOne(inversedBy: 'contraintes')]
     private ?Professeurs $professeur = null;
 
-   
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $jour = null;
 
-    
-
-    public function getId(): ?int
+     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getSemaine(): ?\DateInterval
-    {
-        return $this->semaine;
-    }
-
-    public function setSemaine(\DateInterval $semaine): static
-    {
-        $this->semaine = $semaine;
-
-        return $this;
-    }
+    
 
     public function getDosponibilite(): array
     {
@@ -64,6 +50,18 @@ class Contraintes
     public function setProfesseur(?Professeurs $professeur): static
     {
         $this->professeur = $professeur;
+
+        return $this;
+    }
+
+    public function getJour(): ?\DateTimeInterface
+    {
+        return $this->jour;
+    }
+
+    public function setJour(\DateTimeInterface $jour): static
+    {
+        $this->jour = $jour;
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MatiereRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MatiereRepository::class)]
@@ -28,11 +30,21 @@ class Matieres
     #[ORM\Column]
     private ?bool $activation = null;
 
-    #[ORM\ManyToOne(inversedBy: 'matieres')]
-    private ?Classes $classe = null;
+    
 
     #[ORM\ManyToOne(inversedBy: 'matieres')]
     private ?Professeurs $professeur = null;
+
+    /**
+     * @var Collection<int, Classes>
+     */
+    #[ORM\ManyToMany(targetEntity: Classes::class, inversedBy: 'matieres')]
+    private Collection $classe;
+
+    public function __construct()
+    {
+        $this->classe = new ArrayCollection();
+    }
 
     
 
@@ -103,17 +115,6 @@ class Matieres
         return $this;
     }
 
-    public function getClasse(): ?Classes
-    {
-        return $this->classe;
-    }
-
-    public function setClasse(?Classes $classe): static
-    {
-        $this->classe = $classe;
-
-        return $this;
-    }
 
     public function getProfesseur(): ?Professeurs
     {
@@ -123,6 +124,30 @@ class Matieres
     public function setProfesseur(?Professeurs $professeur): static
     {
         $this->professeur = $professeur;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Classes>
+     */
+    public function getClasse(): Collection
+    {
+        return $this->classe;
+    }
+
+    public function addClasse(Classes $classe): static
+    {
+        if (!$this->classe->contains($classe)) {
+            $this->classe->add($classe);
+        }
+
+        return $this;
+    }
+
+    public function removeClasse(Classes $classe): static
+    {
+        $this->classe->removeElement($classe);
 
         return $this;
     }
