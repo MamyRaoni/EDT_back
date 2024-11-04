@@ -15,7 +15,7 @@ class Contraintes
     private ?int $id = null;
 
     #[ORM\Column(type: Types::ARRAY)]
-    private array $dosponibilite = [];
+    private array $disponibilite = [];
 
     #[ORM\ManyToOne(inversedBy: 'contraintes')]
     private ?Professeurs $professeur = null;
@@ -30,14 +30,14 @@ class Contraintes
 
     
 
-    public function getDosponibilite(): array
+    public function getDisponibilite(): array
     {
-        return $this->dosponibilite;
+        return $this->disponibilite;
     }
 
-    public function setDosponibilite(array $dosponibilite): static
+    public function setDisponibilite(array $disponibilite): static
     {
-        $this->dosponibilite = $dosponibilite;
+        $this->disponibilite = $disponibilite;
 
         return $this;
     }

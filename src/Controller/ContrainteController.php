@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Contrainte;
+use App\Entity\Contraintes;
 use App\Repository\ContrainteRepository;
+use App\Repository\ProfesseurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,20 +23,21 @@ class ContrainteController extends AbstractController
         return new JsonResponse($json, 200, [], true);
     }
     #[Route('/api/contrainte/{id}', name: 'app_contrainte_delete', methods:['DELETE'])  ]
-    public function deleteContrainte(Contrainte $contrainte, EntityManagerInterface $em): JsonResponse
+    public function deleteContrainte(Contraintes $contrainte, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($contrainte);
         $em->flush();
         return $this->json(null, 204);
     }
     #[Route('/api/contrainte', name: 'app_contrainte_create', methods:['POST'])]
-    public function createContrainte(Request $request, EntityManagerInterface $em): JsonResponse
+    public function createContrainte(Request $request, EntityManagerInterface $em, ProfesseurRepository $professeurRepository): JsonResponse
     {
+        
         $data = json_decode($request->getContent(), true);
-        $contrainte = new Contrainte();
+        $contrainte = new Contraintes();
+        $professeur = $professeurRepository->find($data['professeur']);
         $contrainte->setJour(new \DateTime($data['jour']));
-        $contrainte->setTimeslot($data['timeslot']);
-        $contrainte->setIdProf($data['id_prof']);
+        $contrainte->setProfesseur($professeur);
         $em->persist($contrainte);
         $em->flush();
         return $this->json($contrainte, 201);
