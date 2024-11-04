@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\NiveauRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: NiveauRepository::class)]
 class Niveaux
@@ -14,6 +15,7 @@ class Niveaux
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['classe:read'])]
     private ?string $niveau = null;
 
     public function getId(): ?int

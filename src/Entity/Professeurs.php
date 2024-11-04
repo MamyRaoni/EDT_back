@@ -18,15 +18,19 @@ class Professeurs
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getProfesseur'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getProfesseur'])]
     private ?string $grade = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['getProfesseur'])]
     private ?string $sexe = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getProfesseur'])]
     private ?string $contact = null;
 
     /**

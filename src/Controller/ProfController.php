@@ -18,7 +18,7 @@ class ProfController extends AbstractController
     public function getAllProf(ProfesseurRepository $profRepository,  SerializerInterface $serializer): JsonResponse
         {
             $prof = $profRepository->findAll();
-            $json = $serializer->serialize($prof, 'json');
+            $json = $serializer->serialize($prof, 'json', ['groups' => 'getProfesseur']);
             return new JsonResponse($json, 200, [], true);
     }
     #[Route('/api/prof/{id}', name: 'app_prof_detail', methods:['GET'])]

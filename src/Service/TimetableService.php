@@ -2,10 +2,12 @@
 
 namespace App\Service;
 
+use App\Entity\Professeurs;
+
 class TimetableService
 {
     // Fonction principale de génération d'emploi du temps avec backtracking
-    public function generateTimetable($classes, $profs_availabilities, $study_days, &$schedule = [], $class_index = 0)
+    public function generateTimetable(array $classes, array $profs_availabilities, array $study_days, array &$schedule = [], int $class_index = 0): bool
     {
         if ($class_index >= count($classes)) {
             return true;
@@ -13,18 +15,18 @@ class TimetableService
 
         $class = $classes[$class_index];
 
-        foreach ($class['matieres'] as $matiere) {
+        foreach ($class->getMatieres() as $matiere) {
             foreach ($study_days as $day) {
                 $available_slots = $this->getAvailableSlots($day);
 
                 foreach ($available_slots as $slot) {
-                    $prof = $this->findAvailableProf($matiere['id'], $day, $slot['heure_debut'], $slot['heure_fin'], $profs_availabilities, $schedule);
+                    $prof = $this->findAvailableProf($matiere->getId(), $day, $slot['heure_debut'], $slot['heure_fin'], $profs_availabilities, $schedule);
 
                     if ($prof) {
                         $schedule[] = [
-                            'classe_id' => $class['id'],
-                            'matiere_id' => $matiere['id'],
-                            'prof_id' => $prof['id'],
+                            'classe_id' => $class->getId(),
+                            'matiere_id' => $matiere->getId(),
+                            'prof_id' => $prof->getId(),
                             'jour' => $day,
                             'heure_debut' => $slot['heure_debut'],
                             'heure_fin' => $slot['heure_fin']
@@ -43,17 +45,16 @@ class TimetableService
         return false;
     }
 
-    // Fonction pour trouver un professeur disponible
-    public function findAvailableProf($matiere_id, $day, $heure_debut, $heure_fin, $profs_availabilities, $schedule)
+    public function findAvailableProf(int $matiere_id, string $day, string $heure_debut, string $heure_fin, array $profs_availabilities, array $schedule): ?Professeurs
     {
         foreach ($profs_availabilities as $prof) {
-            if (in_array($matiere_id, $prof['matieres'])) {
-                foreach ($prof['disponibilites'] as $disponibilite) {
-                    if ($disponibilite['jour'] == $day &&
-                        $disponibilite['heure_debut'] <= $heure_debut &&
-                        $disponibilite['heure_fin'] >= $heure_fin) {
+            if (in_array($matiere_id, $prof->getMatieres()->toArray())) {
+                foreach ($prof->getDisponibilites() as $disponibilite) {
+                    if ($disponibilite->getJour()->format('Y-m-d') == $day &&
+                        $disponibilite->getHeureDebut() <= $heure_debut &&
+                        $disponibilite->getHeureFin() >= $heure_fin) {
 
-                        if (!$this->isProfBusy($prof['id'], $day, $heure_debut, $heure_fin, $schedule)) {
+                        if (!$this->isProfBusy($prof->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
                             return $prof;
                         }
                     }
@@ -64,8 +65,7 @@ class TimetableService
         return null;
     }
 
-    // Vérifier si un professeur est occupé
-    public function isProfBusy($prof_id, $day, $heure_debut, $heure_fin, $schedule)
+    public function isProfBusy(int $prof_id, string $day, string $heure_debut, string $heure_fin, array $schedule): bool
     {
         foreach ($schedule as $entry) {
             if ($entry['prof_id'] == $prof_id && $entry['jour'] == $day) {
@@ -78,8 +78,7 @@ class TimetableService
         return false;
     }
 
-    // Fonction pour générer les créneaux horaires disponibles
-    public function getAvailableSlots($day)
+    public function getAvailableSlots(string $day): array
     {
         $start_time = "08:00";
         $end_time = "18:00";
@@ -103,15 +102,13 @@ class TimetableService
         return $available_slots;
     }
 
-    // Convertir heure en minutes
-    public function timeToMinutes($time)
+    public function timeToMinutes(string $time): int
     {
         list($hours, $minutes) = explode(':', $time);
         return $hours * 60 + $minutes;
     }
 
-    // Convertir minutes en heure
-    public function minutesToTime($minutes)
+    public function minutesToTime(int $minutes): string
     {
         $hours = floor($minutes / 60);
         $mins = $minutes % 60;

@@ -6,6 +6,7 @@ use App\Repository\ClasseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClasseRepository::class)]
 class Classes
@@ -13,17 +14,23 @@ class Classes
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['classe:read'])]
     private ?int $id = null;
+
+    #[Groups(['classe:read'])]
     #[ORM\Column(length: 255)]
     private ?string $nombre_eleve = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups(['classe:read'])]
     private ?Niveaux $niveau = null;
 
     #[ORM\ManyToOne(inversedBy: 'classes')]
+    #[Groups(['classe:read'])]
     private ?Parcours $parcour = null;
 
     #[ORM\ManyToOne(inversedBy: 'classes')]
+    #[Groups(['classe:read'])]
     private ?Mentions $mention = null;
 
     /**
@@ -36,11 +43,6 @@ class Classes
     {
         $this->matieres = new ArrayCollection();
     }
-
-    
-
-    
-
 
     public function getId(): ?int
     {
