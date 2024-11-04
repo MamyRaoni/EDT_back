@@ -19,16 +19,7 @@ class Parcours
     #[Groups(['classe:read'])]
     private ?string $libelle_parcours = null;
 
-    /**
-     * @var Collection<int, Classes>
-     */
-    #[ORM\OneToMany(targetEntity: Classes::class, mappedBy: 'parcour')]
-    private Collection $classes;
-
-    public function __construct()
-    {
-        $this->classes = new ArrayCollection();
-    }
+   
 
    
 
@@ -49,33 +40,5 @@ class Parcours
         return $this;
     }
 
-    /**
-     * @return Collection<int, Classes>
-     */
-    public function getClasses(): Collection
-    {
-        return $this->classes;
-    }
-
-    public function addClass(Classes $class): static
-    {
-        if (!$this->classes->contains($class)) {
-            $this->classes->add($class);
-            $class->setParcour($this);
-        }
-
-        return $this;
-    }
-
-    public function removeClass(Classes $class): static
-    {
-        if ($this->classes->removeElement($class)) {
-            // set the owning side to null (unless already changed)
-            if ($class->getParcour() === $this) {
-                $class->setParcour(null);
-            }
-        }
-
-        return $this;
-    }
+   
 }

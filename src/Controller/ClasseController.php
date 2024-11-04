@@ -20,24 +20,21 @@ class ClasseController extends AbstractController
     public function getAllContrainte(ClasseRepository $classeRepository, SerializerInterface $serializer): JsonResponse
     {
         $classe = $classeRepository->findAll();
-        $json = $serializer->serialize($classe, 'json', ['groups' => 'getProfesseur']);
+        $json = $serializer->serialize($classe, 'json', ['groups' => 'classe:read']);
         return new JsonResponse($json, 200, []);
     }
     #[Route('/api/classe', name: 'app_classe_create', methods:['POST'])]
-    public function createClasse(Request $request, ParcoursRepository $parcoursRepository, MentionRepository $mentionRepository, NiveauRepository $niveauRepository,  EntityManagerInterface $em): JsonResponse
+    public function createClasse(Request $request,  EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $niveau=$niveauRepository->find($data['niveau']);
-        $parcour=$parcoursRepository->find($data['parcour']);
-        $mention=$mentionRepository->find($data['mention']);
-        $classe =new Classes();
-        $classe->setMention($mention);
-        $classe->setNiveau($niveau);
-        $classe->setParcour($parcour);
-        $classe->setNombreEleve($data['nombre_eleve']);
-
-        $em->persist($classe);
+        $response=[];
+        foreach($data as $classData){
+            $classe =$serializer->deserialize(json_encode($classData), Classes::class, 'json');
+            $em->persist($classe);
+            $response[]=$classe;
+        }
+        
         $em->flush();
-        return $this->json($classe, 201, [], ['groups' => 'classe:read']);
+        return $this->json($classe, 201);
     }
 }

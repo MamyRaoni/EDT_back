@@ -32,19 +32,22 @@ class MatiereController extends AbstractController
         // $em->flush();
         // return $this->json($matiere, 201, [], ['groups' => 'matiere']);
         $data = json_decode($request->getContent(), true);
-        $classe=$classeRepository->find($data['id_classe']);
-        $prof=$professeurRepository->find($data['id_prof']);
-        $matiere =$serializer->deserialize($request->getContent(), Matieres::class, 'json');
-        // $matiere->setLibelle($data['libelle']);
-        // $matiere->setVolumeHoraire($data['volume_horaire']);
-        // $matiere->setVolumeHoraireRestant($data['volume_horaire_restant']);
-        // $matiere->setSemestre($data['semestre']);
-        // $matiere->setActivation($data['activation']);
-        $matiere->setIdClasse($classe);
-        $matiere->setIdProf($prof);
+        $matiere=new Matieres();
+        $classe=$classeRepository->find($data['classe']);
+        $prof=$professeurRepository->find($data['professeur']);
+        // $data['classe'] = $classe;
+        // $data['professeur'] = $prof;
+        //$matiere =$serializer->deserialize(json_encode($data), Matieres::class, 'json');
+        $matiere->setLibelle($data['libelle']);
+        $matiere->setVolumeHoraire($data['volume_horaire']);
+        $matiere->setVolumeHoraireRestant($data['volume_horaire_restant']);
+        $matiere->setSemestre($data['semestre']);
+        $matiere->setActivation($data['activation']);
+        $matiere->addClasse($classe);
+        $matiere->setProfesseur($prof);
         $em->persist($matiere);
         $em->flush();
-        return $this->json($matiere, 201);
+        return $this->json($matiere, 201,[], ['groups' =>['getClasse', 'getProfesseur']]);
         
 
     }

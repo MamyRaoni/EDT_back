@@ -6,6 +6,7 @@ use App\Repository\MatiereRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: MatiereRepository::class)]
 class Matieres
@@ -13,32 +14,40 @@ class Matieres
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getProfesseur', 'getClasse'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getProfesseur', 'getClasse'])]
     private ?string $libelle = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getProfesseur', 'getClasse'])]
     private ?string $volume_horaire = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getProfesseur', 'getClasse'])]
     private ?string $volume_horaire_restant = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getProfesseur', 'getClasse'])]
     private ?string $semestre = null;
 
     #[ORM\Column]
+    #[Groups(['getProfesseur', 'getClasse'])]
     private ?bool $activation = null;
 
     
 
     #[ORM\ManyToOne(inversedBy: 'matieres')]
+    #[Groups(['getClasse'])]
     private ?Professeurs $professeur = null;
 
     /**
      * @var Collection<int, Classes>
      */
     #[ORM\ManyToMany(targetEntity: Classes::class, inversedBy: 'matieres')]
+    #[Groups(['getProfesseur'])]
     private Collection $classe;
 
     public function __construct()

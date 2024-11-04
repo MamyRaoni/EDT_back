@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\NiveauRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -18,6 +20,8 @@ class Niveaux
     #[Groups(['classe:read'])]
     private ?string $niveau = null;
 
+    
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -34,4 +38,5 @@ class Niveaux
 
         return $this;
     }
+     
 }

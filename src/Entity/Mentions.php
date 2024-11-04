@@ -17,22 +17,9 @@ class Mentions
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['classe:read'])]
     private ?string $libelle_mention = null;
 
-    /**
-     * @var Collection<int, Classes>
-     */
-    #[ORM\OneToMany(targetEntity: Classes::class, mappedBy: 'mention')]
-    private Collection $classes;
-
-    public function __construct()
-    {
-        $this->classes = new ArrayCollection();
-    }
-
     
-
     public function getId(): ?int
     {
         return $this->id;
@@ -50,35 +37,8 @@ class Mentions
         return $this;
     }
 
-    /**
-     * @return Collection<int, Classes>
-     */
-    public function getClasses(): Collection
-    {
-        return $this->classes;
-    }
+    
 
-    public function addClass(Classes $class): static
-    {
-        if (!$this->classes->contains($class)) {
-            $this->classes->add($class);
-            $class->setMention($this);
-        }
-
-        return $this;
-    }
-
-    public function removeClass(Classes $class): static
-    {
-        if ($this->classes->removeElement($class)) {
-            // set the owning side to null (unless already changed)
-            if ($class->getMention() === $this) {
-                $class->setMention(null);
-            }
-        }
-
-        return $this;
-    }
-
+   
    
 }

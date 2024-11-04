@@ -34,12 +34,17 @@ class ContrainteController extends AbstractController
     {
         
         $data = json_decode($request->getContent(), true);
-        $contrainte = new Contraintes();
-        $professeur = $professeurRepository->find($data['professeur']);
-        $contrainte->setJour(new \DateTime($data['jour']));
-        $contrainte->setProfesseur($professeur);
-        $contrainte->setDisponibilite($data['disponibilite']);
-        $em->persist($contrainte);
+        $response=[];
+        foreach($data as $classData){
+            $contrainte = new Contraintes();
+            $professeur = $professeurRepository->find($classData['professeur']);
+            $contrainte->setJour(new \DateTime($classData['jour']));
+            $contrainte->setProfesseur($professeur);
+            $contrainte->setDisponibilite($classData['disponibilite']);
+            $em->persist($contrainte);
+            $response[]=$contrainte;
+        }
+        
         $em->flush();
         return $this->json($contrainte, 201,[], ['groups' => 'getProfesseur']);
     }

@@ -14,30 +14,24 @@ class Classes
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['classe:read'])]
+    #[Groups(['getClasse'])]
     private ?int $id = null;
 
-    #[Groups(['classe:read'])]
     #[ORM\Column(length: 255)]
+    #[Groups(['getClasse'])]
     private ?string $nombre_eleve = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[Groups(['classe:read'])]
-    private ?Niveaux $niveau = null;
-
-    #[ORM\ManyToOne(inversedBy: 'classes')]
-    #[Groups(['classe:read'])]
-    private ?Parcours $parcour = null;
-
-    #[ORM\ManyToOne(inversedBy: 'classes')]
-    #[Groups(['classe:read'])]
-    private ?Mentions $mention = null;
+    
 
     /**
      * @var Collection<int, Matieres>
      */
     #[ORM\ManyToMany(targetEntity: Matieres::class, mappedBy: 'classe')]
     private Collection $matieres;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['getClasse'])]
+    private ?string $libelle_classe = null;
 
     public function __construct()
     {
@@ -59,42 +53,6 @@ class Classes
     public function setNombreEleve(string $nombre_eleve): static
     {
         $this->nombre_eleve = $nombre_eleve;
-
-        return $this;
-    }
-
-    public function getNiveau(): ?Niveaux
-    {
-        return $this->niveau;
-    }
-
-    public function setNiveau(?Niveaux $niveau): static
-    {
-        $this->niveau = $niveau;
-
-        return $this;
-    }
-
-    public function getParcour(): ?Parcours
-    {
-        return $this->parcour;
-    }
-
-    public function setParcour(?Parcours $parcour): static
-    {
-        $this->parcour = $parcour;
-
-        return $this;
-    }
-
-    public function getMention(): ?Mentions
-    {
-        return $this->mention;
-    }
-
-    public function setMention(?Mentions $mention): static
-    {
-        $this->mention = $mention;
 
         return $this;
     }
@@ -122,6 +80,18 @@ class Classes
         if ($this->matieres->removeElement($matiere)) {
             $matiere->removeClasse($this);
         }
+
+        return $this;
+    }
+
+    public function getLibelleClasse(): ?string
+    {
+        return $this->libelle_classe;
+    }
+
+    public function setLibelleClasse(string $libelle_classe): static
+    {
+        $this->libelle_classe = $libelle_classe;
 
         return $this;
     }
