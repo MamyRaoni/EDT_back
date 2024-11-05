@@ -14,11 +14,13 @@ class TimetableService
         }
 
         $class = $classes[$class_index];
+        
+        
 
-        foreach ($class->getMatieres() as $matiere) {
+        foreach ($class->getMatieres()->toArray() as $matiere) {
             foreach ($study_days as $day) {
                 $available_slots = $this->getAvailableSlots($day);
-
+                dump($day);
                 foreach ($available_slots as $slot) {
                     $prof = $this->findAvailableProf($matiere->getId(), $day, $slot['heure_debut'], $slot['heure_fin'], $profs_availabilities, $schedule);
 
@@ -47,15 +49,16 @@ class TimetableService
 
     public function findAvailableProf(int $matiere_id, string $day, string $heure_debut, string $heure_fin, array $profs_availabilities, array $schedule): ?Professeurs
     {
-        foreach ($profs_availabilities as $prof) {
-            if (in_array($matiere_id, $prof->getMatieres()->toArray())) {
-                foreach ($prof->getDisponibilites() as $disponibilite) {
+        foreach ($profs_availabilities as $contrainte) {
+            dump($contrainte);
+            if (in_array($matiere_id, $contrainte->getProfesseur()->toArray())) {
+                foreach ($contrainte->getDisponibilites() as $disponibilite) {
                     if ($disponibilite->getJour()->format('Y-m-d') == $day &&
                         $disponibilite->getHeureDebut() <= $heure_debut &&
                         $disponibilite->getHeureFin() >= $heure_fin) {
 
-                        if (!$this->isProfBusy($prof->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
-                            return $prof;
+                        if (!$this->isProfBusy($contrainte->getProfesseur(), $day, $heure_debut, $heure_fin, $schedule)) {
+                            return $contrainte;
                         }
                     }
                 }
@@ -80,7 +83,7 @@ class TimetableService
 
     public function getAvailableSlots(string $day): array
     {
-        $start_time = "08:00";
+        $start_time = "07:30";
         $end_time = "18:00";
         $slot_duration = 2 * 60;
 

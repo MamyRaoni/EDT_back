@@ -15,6 +15,13 @@ class GenerationEmploiDuTempsController extends AbstractController
     public function index(TimetableService $timetableService, ContrainteRepository $contrainteRepository, ClasseRepository $classeRepository): JsonResponse
     {
         $classes = $classeRepository->findAll(); // Remplir avec les données des classes
+        // foreach($classes as $classe){
+        //     foreach($classe->getMatieres()->toArray() as $matiere){
+        //         dump($matiere);
+        //     }
+        //     //dump($classe);
+        //     //dump($classe->getMatieres());
+        // }
         $profs_availabilities = $contrainteRepository->findAll();
         $study_days = [
             '2024-03-18', // Lundi
