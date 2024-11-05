@@ -7,14 +7,16 @@ use App\Repository\ContrainteRepository;
 use App\Service\TimetableService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GenerationEmploiDuTempsController extends AbstractController
 {
-    #[Route('api/generationEDT', name: 'app_generation_emploi_du_temps')]
-    public function index(TimetableService $timetableService, ContrainteRepository $contrainteRepository, ClasseRepository $classeRepository): JsonResponse
+    #[Route('api/generationEDT', name: 'app_generation_emploi_du_temps', methods:['POST'])]
+    public function index(TimetableService $timetableService, ContrainteRepository $contrainteRepository, ClasseRepository $classeRepository, Request $request): JsonResponse
     {
-        $classes = $classeRepository->findAll(); // Remplir avec les données des classes
+        $data = json_decode($request->getContent(), true);
+        $classes = $classeRepository->find($data['classe']); // Remplir avec les données des classes
         // foreach($classes as $classe){
         //     foreach($classe->getMatieres()->toArray() as $matiere){
         //         dump($matiere);
@@ -28,7 +30,9 @@ class GenerationEmploiDuTempsController extends AbstractController
             '2024-03-19', // Mardi
             '2024-03-20', // Mercredi
             '2024-03-21', // Jeudi
-            '2024-03-22'  // Vendredi
+            '2024-03-22',  // Vendredi
+            '2024-03-23'  // Samedi
+
         ]; // Remplir avec les jours d'étude
 
         $schedule = [];

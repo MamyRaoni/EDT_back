@@ -7,17 +7,30 @@ use App\Entity\Professeurs;
 class TimetableService
 {
     // Fonction principale de génération d'emploi du temps avec backtracking
-    public function generateTimetable(array $classes, array $profs_availabilities, array $study_days, array &$schedule = [], int $class_index = 0): bool
+    public function generateTimetable($classes, array $profs_availabilities, array $study_days, array &$schedule = [], int $class_index = 0): bool
     {
-        if ($class_index >= count($classes)) {
-            return true;
-        }
+        // if ($class_index >= count($classes)) {
+        //     return true;
+        // }
 
-        $class = $classes[$class_index];
-        
+        // $class = $classes[$class_index];
         
 
-        foreach ($class->getMatieres()->toArray() as $matiere) {
+
+
+        
+        // foreach($classes->getMatieres()->toArray() as $matiere){
+        //     //dump($matiere);
+        //     foreach($study_days as $day){
+        //         $available_slots=$this->getAvailableSlots($day);
+        //         dump($available_slots);
+
+        //     }
+        // }
+        
+
+        foreach ($classes->getMatieres()->toArray() as $matiere) {
+            dump($matiere);
             foreach ($study_days as $day) {
                 $available_slots = $this->getAvailableSlots($day);
                 dump($day);
@@ -26,7 +39,7 @@ class TimetableService
 
                     if ($prof) {
                         $schedule[] = [
-                            'classe_id' => $class->getId(),
+                            'classe_id' => $classes->getId(),
                             'matiere_id' => $matiere->getId(),
                             'prof_id' => $prof->getId(),
                             'jour' => $day,
@@ -85,7 +98,7 @@ class TimetableService
     {
         $start_time = "07:30";
         $end_time = "18:00";
-        $slot_duration = 2 * 60;
+        $slot_duration = 3/2 * 60;
 
         $start_minutes = $this->timeToMinutes($start_time);
         $end_minutes = $this->timeToMinutes($end_time);
