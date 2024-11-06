@@ -79,39 +79,49 @@ class TimetableService
 
     //     return null;
     // }
-    public function generateTimetable($classes, array $study_days, array &$schedule = []): bool
-    {
-        dump("debut de generatetimetable");
-        foreach ($classes->getMatieres()->toArray() as $matiere) {
-            dump("Traitement de la matière : " . $matiere->getLibelle());
-            foreach ($study_days as $day) {
-                dump("". $day ."");
-                foreach ($this->getAvailableSlots($day) as $index=>$slot) {
-                    dump($slot);
-                    $contraintes=$matiere->getProfesseur()->getContraintes();
-                    $prof = $this->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule, $slot,$matiere);
-                    //dump($day, $slot);
-                    if ($prof) {
-                        $schedule[] = [
-                            'classe_id' => $classes->getId(),
-                            'matiere_id' => $matiere->getId(),
-                            'prof_id' => $prof->getId(),
-                            'jour' => $day,
-                            'heure_debut' => $slot['heure_debut'],
-                            'heure_fin' => $slot['heure_fin']
-                        ];
-                        dump($schedule);
-                        if ($this->generateTimetable($classes, $study_days, $schedule)) {
-                            return true;
-                        }
-                        array_pop($schedule);
+    public function generateTimetable($classe, array $study_days, array &$schedule = []): bool
+{
+    dump("debut de generatetimetable");
+    $matieres = $classe->getMatieres()->toArray();
+    
+    // Ajout de l'index pour les matières
+    for ($matiere_index = 0; $matiere_index < count($matieres); $matiere_index++) {
+        $matiere = $matieres[$matiere_index];
+        dump("Traitement de la matière : " . $matiere->getLibelle());
+        
+        foreach ($study_days as $day) {
+            foreach ($this->getAvailableSlots($day) as $slot) {
+                $contraintes = $matiere->getProfesseur()->getContraintes();
+                $prof = $this->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule, $slot, $matiere);
+                
+                if ($prof) {
+                    $schedule[] = [
+                        'classe_id' => $classe->getId(),
+                        'classe' => $classe->getLibelleClasse(),
+                        'matiere_id' => $matiere->getId(),
+                        'matiere' => $matiere->getLibelle(),
+                        'prof_id' => $prof->getId(),
+                        'prof' => $prof->getNom(),
+                        'jour' => $day,
+                        'heure_debut' => $slot['heure_debut'],
+                        'heure_fin' => $slot['heure_fin']
+                    ];
+                    
+                    // Condition de terminaison pour les matières
+                    if ($matiere_index >= count($matieres) - 1) {
+                        return true; // Toutes les matières ont été traitées
                     }
+                    
+                    if ($this->generateTimetable($classe, $study_days, $schedule)) {
+                        return true;
+                    }
+                    array_pop($schedule);
                 }
-                dump($schedule);
             }
         }
-        return false;
     }
+    return false;
+}
 
     public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule, array $slot, $matiere): ?Professeurs
     {
