@@ -24,7 +24,7 @@ class GenerationEmploiDuTempsController extends AbstractController
         //     //dump($classe);
         //     //dump($classe->getMatieres());
         // }
-        $profs_availabilities = $contrainteRepository->findAll();
+        //$profs_availabilities = $contrainteRepository->findAll();
         $study_days = [
             '2024-03-18', // Lundi
             '2024-03-19', // Mardi
@@ -36,7 +36,8 @@ class GenerationEmploiDuTempsController extends AbstractController
         ]; // Remplir avec les jours d'étude
 
         $schedule = [];
-        $success = $timetableService->generateTimetable($classes, $profs_availabilities, $study_days, $schedule);
+        $success = $timetableService->generateTimetable($classes, $study_days, $schedule);
+        dump($success);
 
         if ($success) {
             return $this->json([

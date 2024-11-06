@@ -7,36 +7,90 @@ use App\Entity\Professeurs;
 class TimetableService
 {
     // Fonction principale de génération d'emploi du temps avec backtracking
-    public function generateTimetable($classes, array $profs_availabilities, array $study_days, array &$schedule = [], int $class_index = 0): bool
+    // public function generateTimetable($classes, array $profs_availabilities, array $study_days, array &$schedule = []): bool
+    // {
+    //     // if ($class_index >= count($classes)) {
+    //     //     return true;
+    //     // }
+
+    //     // $class = $classes[$class_index];
+        
+
+
+
+        
+    //     // foreach($classes->getMatieres()->toArray() as $matiere){
+    //     //     //dump($matiere);
+    //     //     foreach($study_days as $day){
+    //     //         $available_slots=$this->getAvailableSlots($day);
+    //     //         dump($available_slots);
+
+    //     //     }
+    //     // }
+        
+
+    //     foreach ($classes->getMatieres()->toArray() as $matiere) {
+    //         //dump($matiere);
+    //         foreach ($study_days as $day) {
+    //             $available_slots = $this->getAvailableSlots($day);
+    //             //dump($day);
+    //             foreach ($available_slots as $index=>$slot) {
+    //                 dump($index);
+    //                 dump($slot);
+    //                 $prof = $this->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $profs_availabilities, $schedule);
+
+    //                 if ($prof) {
+    //                     $schedule[] = [
+    //                         'classe_id' => $classes->getId(),
+    //                         'matiere_id' => $matiere->getId(),
+    //                         'prof_id' => $prof->getId(),
+    //                         'jour' => $day,
+    //                         'heure_debut' => $slot['heure_debut'],
+    //                         'heure_fin' => $slot['heure_fin']
+    //                     ];
+
+    //                     if ($this->generateTimetable($classes, $profs_availabilities, $study_days, $schedule)) {
+    //                         return true;
+    //                     }
+
+    //                     array_pop($schedule);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return false;
+    // }
+
+    // public function findAvailableProf( string $day, string $heure_debut, string $heure_fin, array $profs_availabilities, array $schedule): ?Professeurs
+    // {
+    //     foreach ($profs_availabilities as $contrainte) {
+    //             foreach ($contrainte->getDisponibilite() as $disponibilite) {
+    //                 dump($disponibilite);
+    //                 if ($disponibilite) {
+    //                     dump($contrainte->getProfesseur());
+    //                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+    //                         return $contrainte->getProfesseur();
+    //                     }
+    //                 }
+    //             }
+            
+    //     }
+
+    //     return null;
+    // }
+    public function generateTimetable($classes, array $study_days, array &$schedule = []): bool
     {
-        // if ($class_index >= count($classes)) {
-        //     return true;
-        // }
-
-        // $class = $classes[$class_index];
-        
-
-
-
-        
-        // foreach($classes->getMatieres()->toArray() as $matiere){
-        //     //dump($matiere);
-        //     foreach($study_days as $day){
-        //         $available_slots=$this->getAvailableSlots($day);
-        //         dump($available_slots);
-
-        //     }
-        // }
-        
-
+        dump("debut de generatetimetable");
         foreach ($classes->getMatieres()->toArray() as $matiere) {
-            dump($matiere);
+            dump("Traitement de la matière : " . $matiere->getLibelle());
             foreach ($study_days as $day) {
-                $available_slots = $this->getAvailableSlots($day);
-                dump($day);
-                foreach ($available_slots as $slot) {
-                    $prof = $this->findAvailableProf($matiere->getId(), $day, $slot['heure_debut'], $slot['heure_fin'], $profs_availabilities, $schedule);
-
+                dump("". $day ."");
+                foreach ($this->getAvailableSlots($day) as $index=>$slot) {
+                    dump($slot);
+                    $contraintes=$matiere->getProfesseur()->getContraintes();
+                    $prof = $this->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule, $slot,$matiere);
+                    //dump($day, $slot);
                     if ($prof) {
                         $schedule[] = [
                             'classe_id' => $classes->getId(),
@@ -46,38 +100,75 @@ class TimetableService
                             'heure_debut' => $slot['heure_debut'],
                             'heure_fin' => $slot['heure_fin']
                         ];
-
-                        if ($this->generateTimetable($classes, $profs_availabilities, $study_days, $schedule, $class_index + 1)) {
+                        dump($schedule);
+                        if ($this->generateTimetable($classes, $study_days, $schedule)) {
                             return true;
                         }
-
                         array_pop($schedule);
                     }
                 }
+                dump($schedule);
             }
         }
-
         return false;
     }
 
-    public function findAvailableProf(int $matiere_id, string $day, string $heure_debut, string $heure_fin, array $profs_availabilities, array $schedule): ?Professeurs
+    public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule, array $slot, $matiere): ?Professeurs
     {
-        foreach ($profs_availabilities as $contrainte) {
-            dump($contrainte);
-            if (in_array($matiere_id, $contrainte->getProfesseur()->toArray())) {
-                foreach ($contrainte->getDisponibilites() as $disponibilite) {
-                    if ($disponibilite->getJour()->format('Y-m-d') == $day &&
-                        $disponibilite->getHeureDebut() <= $heure_debut &&
-                        $disponibilite->getHeureFin() >= $heure_fin) {
-
-                        if (!$this->isProfBusy($contrainte->getProfesseur(), $day, $heure_debut, $heure_fin, $schedule)) {
-                            return $contrainte;
+        foreach ($contraintes as $contrainte) {
+            if($day==$contrainte->getJour()->format('Y-m-d')){
+                //hamaky anle disponibilite amzay
+                //dd($heure_debut, $heure_fin); 
+                foreach($contrainte->getDisponibilite() as $index=>$booleen){
+                    if($booleen){
+                        switch ($index) {
+                            case 0:
+                                if($heure_debut=="07:30"&& $heure_fin == "09:00"){
+                                    if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        return $contrainte->getProfesseur();
+                                    }
+                                }
+                                break;
+                            case 1:
+                                if($heure_debut == "09:00"&& $heure_fin == "10:30"){
+                                    if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        return $contrainte->getProfesseur();
+                                    }
+                                }
+                                break;
+                            case 2:
+                                if($heure_debut == "10:30" && $heure_fin == "12:00"){
+                                    if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        return $contrainte->getProfesseur();
+                                    }
+                                }
+                                break;
+                            case 3:
+                                if($heure_debut == "13:30" && $heure_fin == "15:00"){
+                                    if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        return $contrainte->getProfesseur();
+                                    }
+                                }
+                                break;
+                            case 4:
+                                if($heure_debut == "15:00" && $heure_fin == "16:30"){
+                                    if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        return $contrainte->getProfesseur();
+                                    }
+                                }
+                                break;
+                            case 5:
+                                if($heure_debut == "16:30" && $heure_fin == "18:00"){
+                                    if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        return $contrainte->getProfesseur();
+                                    }
+                                }
+                                break;
                         }
-                    }
-                }
+                      }
+                 }
             }
         }
-
         return null;
     }
 

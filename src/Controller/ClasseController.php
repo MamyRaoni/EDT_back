@@ -20,7 +20,7 @@ class ClasseController extends AbstractController
     public function getAllContrainte(ClasseRepository $classeRepository, SerializerInterface $serializer): JsonResponse
     {
         $classe = $classeRepository->findAll();
-        $json = $serializer->serialize($classe, 'json', ['groups' => 'classe:read']);
+        $json = $serializer->serialize($classe, 'json', ['groups' => 'getClasse']);
         return new JsonResponse($json, 200, []);
     }
     #[Route('/api/classe', name: 'app_classe_create', methods:['POST'])]
