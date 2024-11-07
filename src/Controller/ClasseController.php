@@ -21,7 +21,7 @@ class ClasseController extends AbstractController
     {
         $classe = $classeRepository->findAll();
         $json = $serializer->serialize($classe, 'json', ['groups' => 'getClasse']);
-        return new JsonResponse($json, 200, []);
+        return new JsonResponse($json, 200, [],true);
     }
     #[Route('/api/classe', name: 'app_classe_create', methods:['POST'])]
     public function createClasse(Request $request,  EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse

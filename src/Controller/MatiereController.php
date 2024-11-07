@@ -20,24 +20,16 @@ class MatiereController extends AbstractController
     public function getAllMatiere(MatiereRepository $matiereRepository, SerializerInterface $serializer): JsonResponse
     {
         $matiere=$matiereRepository->findAll();
-        $json = $serializer->serialize($matiere, 'json');
+        $json = $serializer->serialize($matiere, 'json', ['groups' =>['getClasse', 'getProfesseur']]);
         return new JsonResponse($json, 200, [], true);
     }
     #[Route('/api/matiere', name: 'app_matiere_create', methods:['POST'])]
-    public function createMatiere(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, ClasseRepository $classeRepository, ProfesseurRepository $professeurRepository): JsonResponse
+    public function createMatiere(Request $request, EntityManagerInterface $em, ClasseRepository $classeRepository, ProfesseurRepository $professeurRepository): JsonResponse
     {
-        //il y a une reference circulaire dans l'entity Matiere avec la entity Classe ajouter l'annotation @group({"matiere"}) aux propriete du classe Matiere 
-        // $matiere = $serializer->deserialize($request->getContent(), Matiere::class, 'json');
-        // $em->persist($matiere);
-        // $em->flush();
-        // return $this->json($matiere, 201, [], ['groups' => 'matiere']);
         $data = json_decode($request->getContent(), true);
         $matiere=new Matieres();
         $classe=$classeRepository->find($data['classe']);
         $prof=$professeurRepository->find($data['professeur']);
-        // $data['classe'] = $classe;
-        // $data['professeur'] = $prof;
-        //$matiere =$serializer->deserialize(json_encode($data), Matieres::class, 'json');
         $matiere->setLibelle($data['libelle']);
         $matiere->setVolumeHoraire($data['volume_horaire']);
         $matiere->setVolumeHoraireRestant($data['volume_horaire_restant']);
