@@ -43,4 +43,37 @@ class MatiereController extends AbstractController
         
 
     }
+    #[Route('/api/matiere/{id}', name: 'app_matiere_update', methods:['PATCH'])]
+    public function updateMatiere(int $id, Request $request, EntityManagerInterface $em, MatiereRepository $matiereRepository, ClasseRepository $classeRepository, ProfesseurRepository $professeurRepository): JsonResponse
+    {
+        $matiere = $matiereRepository->find($id);
+        if (!$matiere) {
+            throw $this->createNotFoundException('La matière avec l\'id ' . $id . ' n\'existe pas');
+        }
+        $data = json_decode($request->getContent(), true);
+        $classe = $classeRepository->find($data['classe']);
+        $prof = $professeurRepository->find($data['professeur']);
+        $matiere->setLibelle($data['libelle']);
+        $matiere->setVolumeHoraire($data['volume_horaire']);
+        $matiere->setVolumeHoraireRestant($data['volume_horaire_restant']);
+        $matiere->setSemestre($data['semestre']);
+        $matiere->setActivation($data['activation']);
+        $matiere->addClasse($classe);
+        $matiere->setProfesseur($prof);
+        $em->flush();
+        return $this->json($matiere, 200, [], ['groups' =>['getClasse', 'getProfesseur']]);
+    }
+    #[Route('/api/matiere/{id}', name: 'app_matiere_delete', methods:['DELETE'])]
+    public function deleteMatiere(int $id, EntityManagerInterface $em, MatiereRepository $matiereRepository): JsonResponse
+    {
+        $matiere = $matiereRepository->find($id);
+        if (!$matiere) {
+            throw $this->createNotFoundException('La matière avec l\'id ' . $id . ' n\'existe pas');
+        }
+        $em->remove($matiere);
+        $em->flush();
+        return $this->json(null, 204);
+    }
 }
+
+

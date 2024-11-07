@@ -43,4 +43,19 @@ class ProfController extends AbstractController
         $em->flush();
         return $this->json(null, 204);
     }
+    #[Route('/api/prof/{id}', name: 'app_prof_update', methods:['PATCH'])]
+    public function updateProf(int $id, Request $request, EntityManagerInterface $em, ProfesseurRepository $profRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $prof = $profRepository->find($id);
+        if (!$prof) {
+            throw $this->createNotFoundException('Le professeur avec l\'id ' . $id . ' n\'existe pas');
+        }
+        $data = json_decode($request->getContent(), true);
+        $prof->setNom($data['nom']);
+        $prof->setPrenom($data['prenom']);
+        $prof->setEmail($data['email']);
+        $em->flush();
+        return $this->json($prof, 200, [], ['groups' => 'prof']);
+    }
+    
 }

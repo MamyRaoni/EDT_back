@@ -123,12 +123,11 @@ class TimetableService
     return false;
 }
 
-    public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule, array $slot, $matiere): ?Professeurs
+    public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule): ?Professeurs
     {
         foreach ($contraintes as $contrainte) {
             if($day==$contrainte->getJour()->format('Y-m-d')){
                 //hamaky anle disponibilite amzay
-                //dd($heure_debut, $heure_fin); 
                 foreach($contrainte->getDisponibilite() as $index=>$booleen){
                     if($booleen){
                         switch ($index) {
@@ -184,6 +183,7 @@ class TimetableService
 
     public function isProfBusy(int $prof_id, string $day, string $heure_debut, string $heure_fin, array $schedule): bool
     {
+        //tokony eto nou miverifier anle schedule avy any amin'ny base 
         foreach ($schedule as $entry) {
             if ($entry['prof_id'] == $prof_id && $entry['jour'] == $day) {
                 if (($heure_debut < $entry['heure_fin'] && $heure_debut >= $entry['heure_debut']) ||
