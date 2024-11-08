@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Professeurs;
-use App\Repository\EmploiDuTempsRepository;
 
 class TimetableService
 {

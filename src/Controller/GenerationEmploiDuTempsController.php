@@ -6,6 +6,7 @@ use App\Entity\EmploiDuTemps;
 use App\Repository\ClasseRepository;
 use App\Repository\ContrainteRepository;
 use App\Repository\EmploiDuTempsRepository;
+use App\Service\AddContrainteService;
 use App\Service\TimetableService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class GenerationEmploiDuTempsController extends AbstractController
 {
     #[Route('api/generationEDT', name: 'app_generation_emploi_du_temps', methods:['POST'])]
-    public function index(TimetableService $timetableService, ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, ContrainteRepository $contrainteRepository): JsonResponse
+    public function index(TimetableService $timetableService, ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $classes = $classeRepository->find($data['classe']); // Remplir avec les données des classes
@@ -37,7 +38,7 @@ class GenerationEmploiDuTempsController extends AbstractController
        
             
         
-        dump($schedule);
+        //dump($schedule);
         $success = $timetableService->generateTimetable($classes, $study_days,$schedule);
         dump($success);
         dump($schedule);
@@ -47,19 +48,7 @@ class GenerationEmploiDuTempsController extends AbstractController
             ovana le contrainte anle prof ampina mo zany ee manao $schedule[prof_id] de ovana ny contrainte anlery 
             manao switch case ndrepany fa le heure de debut fotsn defa ampy et si 
             */
-            foreach ($schedule as $horaire) {
-                $contrainte = $contrainteRepository->findOneBy([
-                    'professeur' => $horaire['prof_id'],
-                    'jour' => new \DateTime($horaire['jour']),
-                ]);
-                if ($contrainte) {
-                    /* 
-                    Traitement de la contrainte ici 
-                    est c'est ici qu'on change la disponibilite du prof 
-                    */
-                    dump($contrainte);
-                }
-            }
+            $addContrainteService->fetchContrainte( $schedule,$contrainteRepository,$em);
             $edt=new EmploiDuTemps();
             $edt->setClasse($classes->getLibelleClasse());
             $edt->setTableau($schedule);
@@ -79,16 +68,10 @@ class GenerationEmploiDuTempsController extends AbstractController
     /**
      * Vide la table emploi_du_temps.
      */
-    #[Route('/api/emploi-du-temps/vider', name: 'app_emploi_du_temps_vider', methods: ['DELETE'])]
-    public function viderEmploiDuTemps(EntityManagerInterface $em, EmploiDuTempsRepository $emploiDuTempsRepository)
+    #[Route('/api/generationEDT', name: 'app_emploi_du_temps_get', methods: ['GET'])]
+    public function getEmploiDuTemps(EmploiDuTempsRepository $emploiDuTempsRepository)
     {
         $emploiDuTemps = $emploiDuTempsRepository->findAll();
-        foreach ($emploiDuTemps as $edt) {
-            $em->remove($edt);
-        }
-        $em->flush();
-        return $this->json([
-            'message' => 'La table emploi_du_temps a été vidée avec succès.',
-        ]);
+        return $this->json($emploiDuTemps);
     }
 }
