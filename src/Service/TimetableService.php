@@ -89,16 +89,25 @@ class TimetableService
     
     // Ajout de l'index pour les matières
     for ($matiere_index = 0; $matiere_index < count($matieres); $matiere_index++) {
+        
         $matiere = $matieres[$matiere_index];
         dump("Traitement de la matière : " . $matiere->getLibelle());
-        
+        // if(!empty($schedule)){
+        //     foreach($schedule as $edt){
+        //         if($edt["matiere"]==$matiere->getLibelle()){
+                    
+        //         }
+        //     }
+        //     continue;
+        // }
+        $foundSlot = false;
         foreach ($study_days as $day) {
             dump("le jour de : ".$day);
             foreach ($this->getAvailableSlots($day) as $slot) {
                 dump("le slot d'heure : ");
                 dump($slot);
                 $contraintes = $matiere->getProfesseur()->getContraintes();
-                $prof = $this->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule, $slot, $matiere);
+                $prof = $this->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule, $slot);
                 
                 if ($prof) {
                     dump("le prof selectionne : ".$prof->getNom());
@@ -113,6 +122,7 @@ class TimetableService
                         'heure_debut' => $slot['heure_debut'],
                         'heure_fin' => $slot['heure_fin']
                     ];
+                    
                     //dump($schedule);
                     // Condition de terminaison pour les matières
                     if ($matiere_index >= count($matieres) - 1) {
@@ -130,27 +140,26 @@ class TimetableService
     return false;
 }
 
-    public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule, array $test): ?Professeurs
+    public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule): ?Professeurs
     {
         foreach ($contraintes as $contrainte) {
             if($day==$contrainte->getJour()->format('Y-m-d')){
                 //hamaky anle disponibilite amzay
-                dump("base");
-                dump($test);
-
-                    
-                foreach($contrainte->getDisponibilite() as $index=>$booleen){
+               foreach($contrainte->getDisponibilite() as $index=>$booleen){
                     if($booleen){
                         switch ($index) {
                             case 0:
                                 if($heure_debut=="07:30"&& $heure_fin == "09:00"){
+                                    dump("tafiditra ato 7h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
                                         return $contrainte->getProfesseur();
                                     }
                                 }
                                 break;
                             case 1:
+                                
                                 if($heure_debut == "09:00"&& $heure_fin == "10:30"){
+                                    dump("tafiditra ato 9h");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
                                         return $contrainte->getProfesseur();
                                     }
@@ -158,6 +167,7 @@ class TimetableService
                                 break;
                             case 2:
                                 if($heure_debut == "10:30" && $heure_fin == "12:00"){
+                                    dump("tafiditra ato 10h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
                                         return $contrainte->getProfesseur();
                                     }
@@ -165,6 +175,7 @@ class TimetableService
                                 break;
                             case 3:
                                 if($heure_debut == "13:30" && $heure_fin == "15:00"){
+                                    dump("tafiditra ato 13h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
                                         return $contrainte->getProfesseur();
                                     }
@@ -172,6 +183,7 @@ class TimetableService
                                 break;
                             case 4:
                                 if($heure_debut == "15:00" && $heure_fin == "16:30"){
+                                    dump("tafiditra ato 15h");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
                                         return $contrainte->getProfesseur();
                                     }
@@ -179,6 +191,7 @@ class TimetableService
                                 break;
                             case 5:
                                 if($heure_debut == "16:30" && $heure_fin == "18:00"){
+                                    dump("tafiditra ato 16h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
                                         return $contrainte->getProfesseur();
                                     }
@@ -195,18 +208,20 @@ class TimetableService
     public function isProfBusy(int $prof_id, string $day, string $heure_debut, string $heure_fin, array $schedule): bool
     {
         //tokony eto nou miverifier anle schedule avy any amin'ny base 
+        dump($schedule);
         foreach ($schedule as $entry) {
                 // dump("entry");
                 // dump($entry2['prof_id'], $prof_id);
                 // dd($entry2);
-                dump($entry);
+                
+                //dump($entry);
                 if ($entry['prof_id'] == $prof_id && $entry['jour'] == $day) {
                     if (($heure_debut < $entry['heure_fin'] && $heure_debut >= $entry['heure_debut']) ||
                         ($heure_fin > $entry['heure_debut'] && $heure_fin <= $entry['heure_fin'])) {
                         return true;
                     }
                 }
-            
+                
             
         }
         return false;
