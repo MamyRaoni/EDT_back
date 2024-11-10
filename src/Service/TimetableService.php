@@ -106,6 +106,9 @@ class TimetableService
             foreach ($this->getAvailableSlots($day) as $slot) {
                 dump("le slot d'heure : ");
                 dump($slot);
+                if ($this->isClassBusy($classe->getId(), $day, $slot['heure_debut'], $slot['heure_fin'], $schedule)) {
+                    continue; // Passer au créneau suivant si la classe est occupée
+                }
                 $contraintes = $matiere->getProfesseur()->getContraintes();
                 $prof = $this->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule, $slot);
                 
@@ -139,6 +142,18 @@ class TimetableService
     }
     return false;
 }
+    public function isClassBusy(int $classe_id, string $day, string $heure_debut, string $heure_fin, array $schedule): bool
+        {
+            foreach ($schedule as $entry) {
+                if ($entry['classe_id'] == $classe_id && $entry['jour'] == $day) {
+                    if (($heure_debut < $entry['heure_fin'] && $heure_debut >= $entry['heure_debut']) ||
+                        ($heure_fin > $entry['heure_debut'] && $heure_fin <= $entry['heure_fin'])) {
+                        return true; // La classe est déjà occupée à ce créneau
+                    }
+                }
+            }
+            return false;
+        }
 
     public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule): ?Professeurs
     {
