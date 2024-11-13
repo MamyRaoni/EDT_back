@@ -24,8 +24,8 @@ class ProfController extends AbstractController
     #[Route('/api/prof/{id}', name: 'app_prof_detail', methods:['GET'])]
     public function getDetailProf(Professeurs $prof, SerializerInterface $serializer): JsonResponse
     {
-        $json = $serializer->serialize($prof, 'json');
-        return new JsonResponse($json, 200);
+        $json = $serializer->serialize($prof, 'json', ['groups' => 'getProfesseur']);
+        return new JsonResponse($json, 200, [],true);
     }
     #[Route('/api/prof', name: 'app_prof_create', methods:['POST'])]
     public function createProf(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
@@ -34,7 +34,7 @@ class ProfController extends AbstractController
         $prof = $serializer->deserialize($request->getContent(), Professeurs::class, 'json');
         $em->persist($prof);
         $em->flush();
-        return $this->json($prof, 201, [], ['groups' => 'prof']);
+        return $this->json($prof, 201, [], ['groups' => 'getProfesseur']);
     }
     #[Route('/api/prof/{id}', name: 'app_prof_delete', methods:['DELETE'])]
     public function deleteProf(Professeurs $prof, EntityManagerInterface $em): JsonResponse
@@ -51,11 +51,25 @@ class ProfController extends AbstractController
             throw $this->createNotFoundException('Le professeur avec l\'id ' . $id . ' n\'existe pas');
         }
         $data = json_decode($request->getContent(), true);
-        $prof->setNom($data['nom']);
-        $prof->setPrenom($data['prenom']);
-        $prof->setEmail($data['email']);
+        if (isset($data['nom'])) {
+            $prof->setNom($data['nom']);
+        }
+        
+        if (isset($data['grade'])) {
+            $prof->setGrade($data['grade']);
+        }
+        
+        if (isset($data['sexe'])) {
+            $prof->setSexe($data['sexe']);
+        }
+
+        if (isset($data['contact'])) {
+            $prof->setContact($data['contact']);
+        }
+        
         $em->flush();
-        return $this->json($prof, 200, [], ['groups' => 'prof']);
+    
+        return $this->json($prof, 200, [], ['groups' => 'getProfesseur']);
     }
     
 }

@@ -49,15 +49,29 @@ class MatiereController extends AbstractController
             throw $this->createNotFoundException('La matière avec l\'id ' . $id . ' n\'existe pas');
         }
         $data = json_decode($request->getContent(), true);
-        $classe = $classeRepository->find($data['classe']);
-        $prof = $professeurRepository->find($data['professeur']);
-        $matiere->setLibelle($data['libelle']);
-        $matiere->setVolumeHoraire($data['volume_horaire']);
-        $matiere->setVolumeHoraireRestant($data['volume_horaire_restant']);
-        $matiere->setSemestre($data['semestre']);
-        $matiere->setActivation($data['activation']);
-        $matiere->addClasse($classe);
-        $matiere->setProfesseur($prof);
+        if (isset($data['libelle'])) {
+            $matiere->setLibelle($data['libelle']);
+        }
+        if (isset($data['volume_horaire'])) {
+            $matiere->setVolumeHoraire($data['volume_horaire']);
+        }
+        if (isset($data['volume_horaire_restant'])) {
+            $matiere->setVolumeHoraireRestant($data['volume_horaire_restant']);
+        }
+        if (isset($data['semestre'])) {
+            $matiere->setSemestre($data['semestre']);
+        }
+        if (isset($data['activation'])) {
+            $matiere->setActivation($data['activation']);
+        }
+        if (isset($data['classe'])) {
+            $classe = $classeRepository->find($data['classe']);
+            $matiere->addClasse($classe);
+        }
+        if (isset($data['professeur'])) {
+            $prof = $professeurRepository->find($data['professeur']);
+            $matiere->setProfesseur($prof);
+        }
         $em->flush();
         return $this->json($matiere, 200, [], ['groups' =>['getClasse', 'getProfesseur']]);
     }

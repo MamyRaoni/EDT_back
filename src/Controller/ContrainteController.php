@@ -48,4 +48,31 @@ class ContrainteController extends AbstractController
         $em->flush();
         return $this->json($contrainte, 201,[], ['groups' => 'getProfesseur']);
     }
+    #[Route('/api/contrainte/{id}', name: 'app_contrainte_update', methods:['PATCH'])]
+    public function updateContrainte(int $id, Request $request, EntityManagerInterface $em, ContrainteRepository $contrainteRepository, ProfesseurRepository $professeurRepository): JsonResponse
+    {
+        $contrainte = $contrainteRepository->find($id);
+        if (!$contrainte) {
+            throw $this->createNotFoundException('La contrainte avec l\'id ' . $id . ' n\'existe pas');
+        }
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['jour'])) {
+            $contrainte->setJour(new \DateTime($data['jour']));
+        }
+        
+        if (isset($data['disponibilite'])) {
+            $contrainte->setDisponibilite($data['disponibilite']);
+        }
+        if (isset($data['professeur'])) {
+            $professeur = $professeurRepository->find($data['professeur']);
+            if (!$professeur) {
+                throw $this->createNotFoundException('Le professeur avec l\'id ' . $data['professeur'] . ' n\'existe pas');
+            }
+            $contrainte->setProfesseur($professeur);
+        }
+
+        $em->flush();
+    
+        return $this->json($contrainte, 200, [], ['groups' => 'getProfesseur']);
+    }
 }
