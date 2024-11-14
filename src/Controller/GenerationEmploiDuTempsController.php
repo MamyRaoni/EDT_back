@@ -20,7 +20,8 @@ class GenerationEmploiDuTempsController extends AbstractController
     public function index(TimetableService $timetableService, ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $classes = $classeRepository->find($data['classe']); // Remplir avec les données des classes
+        $classes = $classeRepository->find($data['classe']);
+        $semestre=$data['semestre']; // Remplir avec les données des classes
         
         $study_days = [
             '2024-03-18', // Lundi
@@ -33,13 +34,8 @@ class GenerationEmploiDuTempsController extends AbstractController
         ]; // Remplir avec les jours d'étude(normalement envoie dpar l'utilisateur)
         $schedule = [];
         
-        //dump($emploiDuTempsData);
-        
-       
-            
-        
-        //dump($schedule);
-        $success = $timetableService->generateTimetable($classes, $study_days,$schedule);
+      
+        $success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre);
         dump($success);
         dump($schedule);
 

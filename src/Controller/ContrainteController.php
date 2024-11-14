@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Contrainte;
 use App\Entity\Contraintes;
 use App\Repository\ContrainteRepository;
 use App\Repository\ProfesseurRepository;
@@ -74,5 +73,24 @@ class ContrainteController extends AbstractController
         $em->flush();
     
         return $this->json($contrainte, 200, [], ['groups' => 'getProfesseur']);
+    }
+    #[Route('/api/contrainte/disponibilite', name: 'app_contrainte_disponibilite', methods:['POST'])]
+    public function getContrainteByDateAndDisponibilite(Request $request, ContrainteRepository $contrainteRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $date = $data['date']; // Changement ici
+        $disponibilite = $data['disponobilite'];// Changement ici
+
+        if (!$date || !$disponibilite[0]) {
+            return $this->json(['message' => 'La date et la disponibilité sont obligatoires'], 400);
+        }
+
+        $contraintes = $contrainteRepository->findByDateAndDisponibilite(new \DateTime($date), $disponibilite[0]);
+
+        if (empty($contraintes)) {
+            return $this->json(['message' => 'Aucune contrainte trouvée pour cette date et cette disponibilité'], 404);
+        }
+
+        return $this->json($contraintes, 200, [], ['groups' => 'getProfesseur']);
     }
 }

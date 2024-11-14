@@ -7,21 +7,22 @@ use App\Entity\Professeurs;
 class TimetableService
 {
 
-    public function generateTimetable($classe, array $study_days, array &$schedule = []): bool
+    public function generateTimetable($classe, array $study_days, array &$schedule = [], string $semestre): bool
 {
     
     dump("debut de generatetimetable");
     
     $matieres = $classe->getMatieres()->toArray();
-
+    
     
     // Ajout de l'index pour les matières
     for ($matiere_index = 0; $matiere_index < count($matieres); $matiere_index++) {
         
         $matiere = $matieres[$matiere_index];
         dump("Traitement de la matière : " . $matiere->getLibelle());
-
-        $foundSlot = false;
+        if ($matiere->getSemestre() != $semestre) {
+            continue;
+        }
         foreach ($study_days as $day) {
             dump("le jour de : ".$day);
             foreach ($this->getAvailableSlots($day) as $slot) {
@@ -40,6 +41,7 @@ class TimetableService
                         'classe' => $classe->getLibelleClasse(),
                         'matiere_id' => $matiere->getId(),
                         'matiere' => $matiere->getLibelle(),
+                        'semestre'=>$matiere->getSemestre(),
                         'prof_id' => $prof->getId(),
                         'prof' => $prof->getNom(),
                         'jour' => $day,
@@ -52,7 +54,7 @@ class TimetableService
                         return true; // Toutes les matières ont été traitées
                     }
                     
-                    if ($this->generateTimetable($classe, $study_days, $schedule)) {
+                    if ($this->generateTimetable($classe, $study_days, $schedule,$semestre)) {
                         return true;
                     }
                     array_pop($schedule);
@@ -80,6 +82,7 @@ class TimetableService
         foreach ($contraintes as $contrainte) {
             if($day==$contrainte->getJour()->format('Y-m-d')){
                 //hamaky anle disponibilite amzay
+                $professeurTrouve = false;
                foreach($contrainte->getDisponibilite() as $index=>$booleen){
                     if($booleen){
                         switch ($index) {
@@ -87,6 +90,7 @@ class TimetableService
                                 if($heure_debut=="07:30"&& $heure_fin == "09:00"){
                                     dump("tafiditra ato 7h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        $professeurTrouve = true; // Professeur trouvé
                                         return $contrainte->getProfesseur();
                                     }
                                 }
@@ -96,6 +100,7 @@ class TimetableService
                                 if($heure_debut == "09:00"&& $heure_fin == "10:30"){
                                     dump("tafiditra ato 9h");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        $professeurTrouve = true; // Professeur trouvé
                                         return $contrainte->getProfesseur();
                                     }
                                 }
@@ -104,6 +109,7 @@ class TimetableService
                                 if($heure_debut == "10:30" && $heure_fin == "12:00"){
                                     dump("tafiditra ato 10h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        $professeurTrouve = true; // Professeur trouvé
                                         return $contrainte->getProfesseur();
                                     }
                                 }
@@ -112,6 +118,7 @@ class TimetableService
                                 if($heure_debut == "13:30" && $heure_fin == "15:00"){
                                     dump("tafiditra ato 13h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        $professeurTrouve = true; // Professeur trouvé
                                         return $contrainte->getProfesseur();
                                     }
                                 }
@@ -120,6 +127,7 @@ class TimetableService
                                 if($heure_debut == "15:00" && $heure_fin == "16:30"){
                                     dump("tafiditra ato 15h");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        $professeurTrouve = true; // Professeur trouvé
                                         return $contrainte->getProfesseur();
                                     }
                                 }
@@ -128,6 +136,7 @@ class TimetableService
                                 if($heure_debut == "16:30" && $heure_fin == "18:00"){
                                     dump("tafiditra ato 16h30");
                                     if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
+                                        $professeurTrouve = true; // Professeur trouvé
                                         return $contrainte->getProfesseur();
                                     }
                                 }
@@ -135,6 +144,9 @@ class TimetableService
                         }
                       }
                  }
+                 if (!$professeurTrouve) {
+                    return null;
+                }          
             }
         }
         return null;
