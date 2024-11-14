@@ -7,22 +7,29 @@ use App\Entity\Professeurs;
 class TimetableService
 {
 
-    public function generateTimetable($classe, array $study_days, array &$schedule = [], string $semestre): bool
+    public function generateTimetable($classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere=[]): bool
 {
-    
     dump("debut de generatetimetable");
-    
-    $matieres = $classe->getMatieres()->toArray();
-    
-    
-    // Ajout de l'index pour les matières
+     $matieres = $classe->getMatieres()->toArray();
+      // Initialisation de $tour_matiere si c'est le premier appel
+    if (empty($tour_matiere)) {
+        foreach ($matieres as $index => $matiere) {
+            $tour_matiere[$index] = $matiere->getVolumeHoraireRestant() ?? 0; // Assurez-vous d'initialiser avec une valeur valide
+        }
+    }
+     // Ajout de l'index pour les matières
     for ($matiere_index = 0; $matiere_index < count($matieres); $matiere_index++) {
-        
         $matiere = $matieres[$matiere_index];
+        //$tour_matiere[$matiere_index]=$matiere->getVolumeHoraireRestant();
         dump("Traitement de la matière : " . $matiere->getLibelle());
         if ($matiere->getSemestre() != $semestre) {
             continue;
         }
+        
+        if($tour_matiere[$matiere_index] > $matiere->getVolumeHoraire()){
+            continue;
+        }
+        
         foreach ($study_days as $day) {
             dump("le jour de : ".$day);
             foreach ($this->getAvailableSlots($day) as $slot) {
@@ -36,6 +43,7 @@ class TimetableService
                 
                 if ($prof) {
                     dump("le prof selectionne : ".$prof->getNom());
+                    $tour_matiere[$matiere_index]++;
                     $schedule[] = [
                         'classe_id' => $classe->getId(),
                         'classe' => $classe->getLibelleClasse(),
@@ -48,16 +56,16 @@ class TimetableService
                         'heure_debut' => $slot['heure_debut'],
                         'heure_fin' => $slot['heure_fin']
                     ];
-                    
+                    if ($this->generateTimetable($classe, $study_days, $schedule,$semestre,$tour_matiere)) {
+                        dump("tafiditra amin'ny if alohan'ny farany");
+                        return true;
+                    }
+                    dump("effacement de schedule");
+                    array_pop($schedule);
                     // Condition de terminaison pour les matières
                     if ($matiere_index >= count($matieres) - 1) {
                         return true; // Toutes les matières ont été traitées
                     }
-                    
-                    if ($this->generateTimetable($classe, $study_days, $schedule,$semestre)) {
-                        return true;
-                    }
-                    array_pop($schedule);
                 }
             }
         }

@@ -19,7 +19,7 @@ class AddContrainteService{
             if ($contrainte) {
                     $disponibilites = $contrainte->getDisponibilite();
                 }
-            dump($disponibilites);
+            //dump($disponibilites);
             if(is_array($disponibilites)){
                 switch ($horaire['heure_debut']) {
                     case '07:30':

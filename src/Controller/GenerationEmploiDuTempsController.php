@@ -33,9 +33,10 @@ class GenerationEmploiDuTempsController extends AbstractController
 
         ]; // Remplir avec les jours d'étude(normalement envoie dpar l'utilisateur)
         $schedule = [];
+        $tour_matiere=[];
         
       
-        $success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre);
+        $success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere);
         dump($success);
         dump($schedule);
 

@@ -71,5 +71,17 @@ class ProfController extends AbstractController
     
         return $this->json($prof, 200, [], ['groups' => 'getProfesseur']);
     }
+    #[Route('/api/contrainte/prof/{id}', name: 'app_prof_detail', methods:['GET'])]
+    public function getDetailProfcontrainte(int $id, ProfesseurRepository $professeurRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $prof = $professeurRepository->find($id);
+        if (!$prof) {
+            throw $this->createNotFoundException('Le professeur avec l\'id ' . $id . ' n\'existe pas');
+        }
+        $matieres=$prof->getMatieres();
+        $json = $serializer->serialize($matieres, 'json', ['groups' => 'getProfesseur']);
+        return new JsonResponse($json, 200, [],true);
+    }
+
     
 }

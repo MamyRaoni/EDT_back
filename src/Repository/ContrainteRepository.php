@@ -41,4 +41,14 @@ class ContrainteRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+//     public function findByDate(\DateTime $date): array
+// {
+//     // Créer la requête avec QueryBuilder
+//     return $this->createQueryBuilder('c')
+//         ->where('c.date = :date')
+//         ->setParameter('date', $date->format('Y-m-d'))
+//         ->getQuery()
+//         ->getResult();
+// }
+
 }

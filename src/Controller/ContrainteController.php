@@ -78,19 +78,30 @@ class ContrainteController extends AbstractController
     public function getContrainteByDateAndDisponibilite(Request $request, ContrainteRepository $contrainteRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $date = $data['date']; // Changement ici
-        $disponibilite = $data['disponobilite'];// Changement ici
+        $date = new \DateTime($data['date']); // Changement ici
+        $disponibilite = $data['disponibilite'];// Changement ici
+        $index=$data['index'];
 
-        if (!$date || !$disponibilite[0]) {
-            return $this->json(['message' => 'La date et la disponibilité sont obligatoires'], 400);
+        if (!$date || !isset($index) || !isset($disponibilite)) {
+            return $this->json(['message' => 'La date, l\'index et la disponibilité sont obligatoires'], 400);
         }
 
-        $contraintes = $contrainteRepository->findByDateAndDisponibilite(new \DateTime($date), $disponibilite[0]);
+        $contraintes = $contrainteRepository->findBy([
+            'jour'=>$date
+    ]);
 
-        if (empty($contraintes)) {
+        // Filtrer les contraintes en PHP
+        $resultatsFiltres = array_filter($contraintes, function ($contrainte) use ($index, $disponibilite) {
+            $disponibiliteArray = $contrainte->getDisponibilite(); // Récupérer le tableau de disponibilité
+    
+            // Vérifier si l'index existe dans le tableau et si la valeur est égale à la disponibilité attendue
+            return is_array($disponibiliteArray) && isset($disponibiliteArray[$index]) && $disponibiliteArray[$index] === $disponibilite;
+        });
+    
+        if (empty($resultatsFiltres)) {
             return $this->json(['message' => 'Aucune contrainte trouvée pour cette date et cette disponibilité'], 404);
         }
-
-        return $this->json($contraintes, 200, [], ['groups' => 'getProfesseur']);
+    
+        return $this->json($resultatsFiltres, 200, [], ['groups' => 'getProfesseur']);
     }
 }
