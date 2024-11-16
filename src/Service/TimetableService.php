@@ -10,6 +10,7 @@ class TimetableService
     public function generateTimetable($classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere=[]): bool
 {
     dump("debut de generatetimetable");
+     
      $matieres = $classe->getMatieres()->toArray();
       // Initialisation de $tour_matiere si c'est le premier appel
     if (empty($tour_matiere)) {
@@ -21,6 +22,7 @@ class TimetableService
     for ($matiere_index = 0; $matiere_index < count($matieres); $matiere_index++) {
         $matiere = $matieres[$matiere_index];
         //$tour_matiere[$matiere_index]=$matiere->getVolumeHoraireRestant();
+
         dump("Traitement de la matière : " . $matiere->getLibelle());
         if ($matiere->getSemestre() != $semestre) {
             continue;
