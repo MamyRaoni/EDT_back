@@ -78,7 +78,7 @@ class ProfController extends AbstractController
         if (!$prof) {
             throw $this->createNotFoundException('Le professeur avec l\'id ' . $id . ' n\'existe pas');
         }
-        $matieres=$prof->getMatieres();
+        $matieres=$prof->getContraintes();
         $json = $serializer->serialize($matieres, 'json', ['groups' => 'getProfesseur']);
         return new JsonResponse($json, 200, [],true);
     }

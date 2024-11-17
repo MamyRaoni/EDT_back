@@ -6,6 +6,7 @@ use App\Entity\EmploiDuTemps;
 use App\Repository\ClasseRepository;
 use App\Repository\ContrainteRepository;
 use App\Repository\EmploiDuTempsRepository;
+use App\Repository\SalleRepository;
 use App\Service\AddContrainteService;
 use App\Service\TimetableService;
 use App\Service\EmploiDuTempsService;
@@ -18,10 +19,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class GenerationEmploiDuTempsController extends AbstractController
 {
     #[Route('api/generationEDT', name: 'app_generation_emploi_du_temps', methods:['POST'])]
-    public function index(ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository, EmploiDuTempsService $emploiDuTempsService): JsonResponse
+    public function index(ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository, EmploiDuTempsService $emploiDuTempsService, SalleRepository $salleRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $classes = $classeRepository->find($data['classe']);
+        $salles= $salleRepository->findAll();
         $semestre=$data['semestre']; // Remplir avec les données des classes
         
         $study_days = [
@@ -38,7 +40,7 @@ class GenerationEmploiDuTempsController extends AbstractController
         
       
         //$success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere);
-        $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere);
+        $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere,$salles);
         dump($success);
         dump($schedule);
 

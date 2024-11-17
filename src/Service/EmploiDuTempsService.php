@@ -8,18 +8,21 @@ class EmploiDuTempsService
     private SlotService $slotService;
     private ProfAvailabilityService $profAvailabilityService;
     private ClassBussyCheckerService $classBussyCheckerService;
+    private AffectationSalleService $affectationSalleService;
 
     public function __construct(
         SlotService $slotService,
         ProfAvailabilityService $profAvailabilityService,
-        ClassBussyCheckerService $classBussyCheckerService
+        ClassBussyCheckerService $classBussyCheckerService,
+        AffectationSalleService $affectationSalleService
     ) {
         $this->slotService = $slotService;
         $this->profAvailabilityService = $profAvailabilityService;
         $this->classBussyCheckerService = $classBussyCheckerService;
+        $this->affectationSalleService=$affectationSalleService;
     }
 
-    public function generateTimetable(Classes $classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere = []): bool
+    public function generateTimetable(Classes $classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere = [],$salles): bool
     {
         // Logique principale, en utilisant les services injectés
         $matieres = $classe->getMatieres()->toArray();
@@ -47,28 +50,33 @@ class EmploiDuTempsService
                     $contraintes = $matiere->getProfesseur()->getContraintes();
                     $prof = $this->profAvailabilityService->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule);
                     if($prof){
-                        $tour_matiere[$matiere_index]++;
-                        $schedule[]=[
-                            'classe_id' => $classe->getId(),
-                            'classe' => $classe->getLibelleClasse(),
-                            'matiere_id' => $matiere->getId(),
-                            'matiere' => $matiere->getLibelle(),
-                            'semestre'=>$matiere->getSemestre(),
-                            'prof_id' => $prof->getId(),
-                            'prof' => $prof->getNom(),
-                            'jour' => $day,
-                            'heure_debut' => $slot['heure_debut'],
-                            'heure_fin' => $slot['heure_fin']
-                        ];
-                        if($this->generateTimetable($classe, $study_days, $schedule, $semestre, $tour_matiere)){
-                            return true;
-                        }
+                        $sallePrevue=$this->affectationSalleService->Affectation($salles,$classe,$schedule);
+                        if($sallePrevue){
+                            $tour_matiere[$matiere_index]++;
+                            $schedule[]=[
+                                'classe_id' => $classe->getId(),
+                                'classe' => $classe->getLibelleClasse(),
+                                'matiere_id' => $matiere->getId(),
+                                'matiere' => $matiere->getLibelle(),
+                                'semestre'=>$matiere->getSemestre(),
+                                'prof_id' => $prof->getId(),
+                                'prof' => $prof->getNom(),
+                                'jour' => $day,
+                                'heure_debut' => $slot['heure_debut'],
+                                'heure_fin' => $slot['heure_fin'],
+                                'salle'=>$sallePrevue
+                            ];
+                            if($this->generateTimetable($classe, $study_days, $schedule, $semestre, $tour_matiere,$salles)){
+                                return true;
+                            }
 
-                        array_pop($schedule);
+                            array_pop($schedule);
 
-                        if ($matiere_index >= count($matieres) - 1) {
-                            return true; // Toutes les matières ont été traitées
+                            if ($matiere_index >= count($matieres) - 1) {
+                                return true; // Toutes les matières ont été traitées
+                            }
                         }
+                        
                     }
                 // Utilisez les autres services pour vérifier les contraintes et la disponibilité
                 }

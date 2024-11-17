@@ -19,7 +19,7 @@ class ContrainteController extends AbstractController
     {
         $contrainte = $contrainteRepository->findAll();
         $json = $serializer->serialize($contrainte, 'json', ['groups' => 'getProfesseur']);
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, 200,[], true);
     }
     #[Route('/api/contrainte/{id}', name: 'app_contrainte_delete', methods:['DELETE'])  ]
     public function deleteContrainte(Contraintes $contrainte, EntityManagerInterface $em): JsonResponse
