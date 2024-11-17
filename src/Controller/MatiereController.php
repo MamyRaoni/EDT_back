@@ -40,7 +40,7 @@ class MatiereController extends AbstractController
         $em->persist($matiere);
         $em->flush();
         return $this->json($matiere, 201,[], ['groups' =>['getClasse', 'getProfesseur']]);
-     }
+    }
     #[Route('/api/matiere/{id}', name: 'app_matiere_update', methods:['PATCH'])]
     public function updateMatiere(int $id, Request $request, EntityManagerInterface $em, MatiereRepository $matiereRepository, ClasseRepository $classeRepository, ProfesseurRepository $professeurRepository): JsonResponse
     {
