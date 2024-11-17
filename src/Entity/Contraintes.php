@@ -24,9 +24,9 @@ class Contraintes
     #[Groups(['getProfesseur'])]
     private ?Professeurs $professeur = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(length:255)]
     #[Groups(['getProfesseur'])]
-    private ?\DateTimeInterface $jour = null;
+    private ?string $jour = null;
 
      public function getId(): ?int
     {
@@ -59,12 +59,12 @@ class Contraintes
         return $this;
     }
 
-    public function getJour(): ?\DateTimeInterface
+    public function getJour(): ?string
     {
         return $this->jour;
     }
 
-    public function setJour(\DateTimeInterface $jour): static
+    public function setJour(string $jour): static
     {
         $this->jour = $jour;
 

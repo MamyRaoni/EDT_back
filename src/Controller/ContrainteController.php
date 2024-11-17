@@ -37,7 +37,7 @@ class ContrainteController extends AbstractController
         foreach($data as $classData){
             $contrainte = new Contraintes();
             $professeur = $professeurRepository->find($classData['professeur']);
-            $contrainte->setJour(new \DateTime($classData['jour']));
+            $contrainte->setJour($classData['jour']);
             $contrainte->setProfesseur($professeur);
             $contrainte->setDisponibilite($classData['disponibilite']);
             $em->persist($contrainte);
@@ -56,7 +56,7 @@ class ContrainteController extends AbstractController
         }
         $data = json_decode($request->getContent(), true);
         if (isset($data['jour'])) {
-            $contrainte->setJour(new \DateTime($data['jour']));
+            $contrainte->setJour($data['jour']);
         }
         
         if (isset($data['disponibilite'])) {
@@ -78,7 +78,7 @@ class ContrainteController extends AbstractController
     public function getContrainteByDateAndDisponibilite(Request $request, ContrainteRepository $contrainteRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $date = new \DateTime($data['date']); // Changement ici
+        $date = $data['date']; // Changement ici
         $disponibilite = $data['disponibilite'];// Changement ici
         $index=$data['index'];
 

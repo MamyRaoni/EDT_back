@@ -6,9 +6,11 @@ use App\Entity\EmploiDuTemps;
 use App\Repository\ClasseRepository;
 use App\Repository\ContrainteRepository;
 use App\Repository\EmploiDuTempsRepository;
+use App\Repository\ProfesseurRepository;
 use App\Repository\SalleRepository;
 use App\Service\AddContrainteService;
-use App\Service\TimetableService;
+use App\Service\ContrainteSnapshotService;
+//use App\Service\TimetableService;
 use App\Service\EmploiDuTempsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class GenerationEmploiDuTempsController extends AbstractController
 {
     #[Route('api/generationEDT', name: 'app_generation_emploi_du_temps', methods:['POST'])]
-    public function index(ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository, EmploiDuTempsService $emploiDuTempsService, SalleRepository $salleRepository): JsonResponse
+    public function index(ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository, EmploiDuTempsService $emploiDuTempsService, SalleRepository $salleRepository, ContrainteSnapshotService $contrainteSnapshotService): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $classes = $classeRepository->find($data['classe']);
@@ -34,16 +36,14 @@ class GenerationEmploiDuTempsController extends AbstractController
             '2024-03-22',  // Vendredi
             '2024-03-23'  // Samedi
 
-        ]; // Remplir avec les jours d'étude(normalement envoie dpar l'utilisateur)
+        ]; 
         $schedule = [];
         $tour_matiere=[];
-        
-      
         //$success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere);
+        $contrainteSnapshotService->exportContraintes();
         $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere,$salles);
         dump($success);
         dump($schedule);
-
         if ($success) {
             /*
             ovana le contrainte anle prof ampina mo zany ee manao $schedule[prof_id] de ovana ny contrainte anlery 
@@ -75,4 +75,12 @@ class GenerationEmploiDuTempsController extends AbstractController
         $emploiDuTemps = $emploiDuTempsRepository->findAll();
         return $this->json($emploiDuTemps);
     }
+    #[Route('/api/regenerateContrainte', name:'app_regenrate_contrainte', methods:['GET'])]
+    public function regenerateContrainte(ContrainteSnapshotService $contrainteSnapshotService, ProfesseurRepository $professeurRepository){
+        $contrainteSnapshotService->importContraintes($professeurRepository);
+        return $this->json([
+            'message' => 'success of generation of table Contrainte',
+        ], 200);
+    }
+
 }
