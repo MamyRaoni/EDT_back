@@ -44,7 +44,7 @@ class ProfController extends AbstractController
         return $this->json(null, 204);
     }
     #[Route('/api/prof/{id}', name: 'app_prof_update', methods:['PATCH'])]
-    public function updateProf(int $id, Request $request, EntityManagerInterface $em, ProfesseurRepository $profRepository, SerializerInterface $serializer): JsonResponse
+    public function updateProf(int $id, Request $request, EntityManagerInterface $em, ProfesseurRepository $profRepository): JsonResponse
     {
         $prof = $profRepository->find($id);
         if (!$prof) {

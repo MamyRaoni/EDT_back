@@ -14,7 +14,7 @@ class AddContrainteService{
             foreach ($schedule as $horaire) {
             $contrainte = $contrainteRepository->findOneBy([
                 'professeur' => $horaire['prof_id'],
-                'jour' => new \DateTime($horaire['jour']),
+                'jour' => ($horaire['jour']),
             ]);
             if ($contrainte) {
                     $disponibilites = $contrainte->getDisponibilite();

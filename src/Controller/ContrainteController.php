@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Contraintes;
+use App\Repository\ClasseRepository;
 use App\Repository\ContrainteRepository;
 use App\Repository\ProfesseurRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,23 +52,27 @@ class ContrainteController extends AbstractController
     public function updateContrainte(int $id, Request $request, EntityManagerInterface $em, ContrainteRepository $contrainteRepository, ProfesseurRepository $professeurRepository): JsonResponse
     {
         $contrainte = $contrainteRepository->find($id);
-        if (!$contrainte) {
-            throw $this->createNotFoundException('La contrainte avec l\'id ' . $id . ' n\'existe pas');
-        }
-        $data = json_decode($request->getContent(), true);
-        if (isset($data['jour'])) {
-            $contrainte->setJour($data['jour']);
-        }
-        
-        if (isset($data['disponibilite'])) {
-            $contrainte->setDisponibilite($data['disponibilite']);
-        }
-        if (isset($data['professeur'])) {
-            $professeur = $professeurRepository->find($data['professeur']);
-            if (!$professeur) {
-                throw $this->createNotFoundException('Le professeur avec l\'id ' . $data['professeur'] . ' n\'existe pas');
+        try {
+            if (!$contrainte) {
+                throw $this->createNotFoundException('La contrainte avec l\'id ' . $id . ' n\'existe pas');
             }
-            $contrainte->setProfesseur($professeur);
+            $data = json_decode($request->getContent(), true);
+            if (isset($data['jour'])) {
+                $contrainte->setJour($data['jour']);
+            }
+            
+            if (isset($data['disponibilite'])) {
+                $contrainte->setDisponibilite($data['disponibilite']);
+            }
+            if (isset($data['professeur'])) {
+                $professeur = $professeurRepository->find($data['professeur']);
+                if (!$professeur) {
+                    throw $this->createNotFoundException('Le professeur avec l\'id ' . $data['professeur'] . ' n\'existe pas');
+                }
+                $contrainte->setProfesseur($professeur);
+            }
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 404);
         }
 
         $em->flush();

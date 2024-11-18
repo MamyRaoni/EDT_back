@@ -42,8 +42,6 @@ class GenerationEmploiDuTempsController extends AbstractController
         //$success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere);
         $contrainteSnapshotService->exportContraintes();
         $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere,$salles);
-        dump($success);
-        dump($schedule);
         if ($success) {
             /*
             ovana le contrainte anle prof ampina mo zany ee manao $schedule[prof_id] de ovana ny contrainte anlery 
@@ -55,11 +53,12 @@ class GenerationEmploiDuTempsController extends AbstractController
             $edt->setTableau($schedule);
             $em->persist($edt);
             $em->flush();
-            return $this->json([
-                'message' => 'Emploi du temps généré avec succès!',
-                'schedule' => $schedule,
-            ]);
-        } else {
+            // return $this->json([
+            //     'message' => 'Emploi du temps généré avec succès!'
+            // ], 200, []);
+            return $this->json(null, 200,[]);
+        } 
+        else {
             return $this->json([
                 'message' => 'Échec de la génération de l\'emploi du temps.',
             ], 500);
@@ -82,5 +81,21 @@ class GenerationEmploiDuTempsController extends AbstractController
             'message' => 'success of generation of table Contrainte',
         ], 200);
     }
+    /**
+     * Vide la table emploi_du_temps.
+     */
+    #[Route('/api/videEmploiDuTemps', name: 'app_vide_emploi_du_temps', methods: ['DELETE'])]
+    public function videEmploiDuTemps(EmploiDuTempsRepository $emploiDuTempsRepository, EntityManagerInterface $em)
+    {
+        $emploiDuTemps = $emploiDuTempsRepository->findAll();
+        foreach ($emploiDuTemps as $edt) {
+            $em->remove($edt);
+        }
+        $em->flush();
+        return $this->json([
+            'message' => 'La table emploi_du_temps a été vidée avec succès.',
+        ], 200);
+    }
+    
 
 }

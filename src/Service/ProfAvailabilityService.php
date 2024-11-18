@@ -9,7 +9,7 @@ class ProfAvailabilityService
     public function findAvailableProf(string $day, string $heure_debut, string $heure_fin, $contraintes, array $schedule): ?Professeurs
     {
         foreach ($contraintes as $contrainte) {
-            if ($day === $contrainte->getJour()->format('Y-m-d')) {
+            if ($day === $contrainte->getJour()) {
                 foreach ($contrainte->getDisponibilite() as $index => $booleen) {
                     if ($booleen && $this->isMatchingSlot($index, $heure_debut, $heure_fin)) {
                         if (!$this->isProfBusy($contrainte->getProfesseur()->getId(), $day, $heure_debut, $heure_fin, $schedule)) {
