@@ -1,14 +1,11 @@
 <?php
 namespace App\Service;
 
-use App\Entity\Contrainte;
+
 use App\Entity\Contraintes;
 use App\Repository\ProfesseurRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-
 class ContrainteSnapshotService
 {
     private $entityManager;
@@ -28,20 +25,25 @@ class ContrainteSnapshotService
     {
         $repository = $this->entityManager->getRepository(Contraintes::class);
         $contraintes = $repository->findAll();
-
+        
+        if($this->filesystem->exists($this->snapshotFilePath)){
+            return;
+        }
+            $data = array_map(function(Contraintes $contrainte) {
+                return [
+                    'prof_id' => $contrainte->getProfesseur()->getId(),
+                    'disponibilite' => $contrainte->getDisponibilite(),
+                    'jour' => $contrainte->getJour(),
+                    // Ajoutez d'autres champs si nécessaire
+                ];
+            }, $contraintes);
+    
+            // Sauvegarder les données en JSON
+            $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+            $this->filesystem->dumpFile($this->snapshotFilePath, $jsonData);
+        
         // Convertir les contraintes en tableau associatif
-        $data = array_map(function(Contraintes $contrainte) {
-            return [
-                'prof_id' => $contrainte->getProfesseur()->getId(),
-                'disponibilite' => $contrainte->getDisponibilite(),
-                'jour' => $contrainte->getJour(),
-                // Ajoutez d'autres champs si nécessaire
-            ];
-        }, $contraintes);
-
-        // Sauvegarder les données en JSON
-        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        $this->filesystem->dumpFile($this->snapshotFilePath, $jsonData);
+        
     }
 
     // Restaurer les contraintes depuis le fichier JSON

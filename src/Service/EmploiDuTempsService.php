@@ -21,10 +21,10 @@ class EmploiDuTempsService
         $this->classBussyCheckerService = $classBussyCheckerService;
         $this->affectationSalleService=$affectationSalleService;
     }
-
-    public function generateTimetable(Classes $classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere = [],$salles): bool
+    // Logique principale, en utilisant les services injectés
+    public function generateTimetable(Classes $classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere = [],$salles,$tablEdt): bool
     {
-        // Logique principale, en utilisant les services injectés
+        
         $matieres = $classe->getMatieres()->toArray();
         if (empty($tour_matiere)) {
             foreach ($matieres as $index => $matiere) {
@@ -32,13 +32,13 @@ class EmploiDuTempsService
             }
         }
         for($matiere_index = 0; $matiere_index < count($matieres); $matiere_index++) {
-
+            
             $matiere = $matieres[$matiere_index];
             if ($matiere->getSemestre() != $semestre) {
                 continue;
             }
             
-            if($tour_matiere[$matiere_index] > $matiere->getVolumeHoraire()){
+            if($tour_matiere[$matiere_index] >= $matiere->getVolumeHoraire()){
                 continue;
             }
             foreach ($study_days as $day) {
@@ -50,8 +50,8 @@ class EmploiDuTempsService
                     $contraintes = $matiere->getProfesseur()->getContraintes();
                     $prof = $this->profAvailabilityService->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule);
                     if($prof){
-                        $sallePrevue=$this->affectationSalleService->Affectation($salles,$classe,$schedule);
-                        if($sallePrevue){
+                        //$sallePrevue=$this->affectationSalleService->Affectation($salles,$classe,$tablEdt);
+                       
                             $tour_matiere[$matiere_index]++;
                             $schedule[]=[
                                 'classe_id' => $classe->getId(),
@@ -64,9 +64,9 @@ class EmploiDuTempsService
                                 'jour' => $day,
                                 'heure_debut' => $slot['heure_debut'],
                                 'heure_fin' => $slot['heure_fin'],
-                                'salle'=>$sallePrevue
+                                //'salle'=>$sallePrevue
                             ];
-                            if($this->generateTimetable($classe, $study_days, $schedule, $semestre, $tour_matiere,$salles)){
+                            if($this->generateTimetable($classe, $study_days, $schedule, $semestre, $tour_matiere,$salles,$tablEdt)){
                                 return true;
                             }
 
@@ -75,10 +75,9 @@ class EmploiDuTempsService
                             if ($matiere_index >= count($matieres) - 1) {
                                 return true; // Toutes les matières ont été traitées
                             }
-                        }
+                        
                         
                     }
-                // Utilisez les autres services pour vérifier les contraintes et la disponibilité
                 }
                 
             }

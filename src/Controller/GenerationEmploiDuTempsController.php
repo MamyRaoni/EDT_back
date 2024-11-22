@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class GenerationEmploiDuTempsController extends AbstractController
 {
     #[Route('api/generationEDT', name: 'app_generation_emploi_du_temps', methods:['POST'])]
-    public function index(ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository, EmploiDuTempsService $emploiDuTempsService, SalleRepository $salleRepository, ContrainteSnapshotService $contrainteSnapshotService): JsonResponse
+    public function index(ClasseRepository $classeRepository, Request $request, EntityManagerInterface $em, AddContrainteService $addContrainteService, ContrainteRepository $contrainteRepository, EmploiDuTempsService $emploiDuTempsService, SalleRepository $salleRepository, ContrainteSnapshotService $contrainteSnapshotService,EmploiDuTempsRepository $emploiDuTempsRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $classes = $classeRepository->find($data['classe']);
@@ -39,9 +39,10 @@ class GenerationEmploiDuTempsController extends AbstractController
         ]; 
         $schedule = [];
         $tour_matiere=[];
+        $tablEdt=$emploiDuTempsRepository->findAll();
         //$success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere);
         $contrainteSnapshotService->exportContraintes();
-        $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere,$salles);
+        $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere,$salles,$tablEdt);
         if ($success) {
             /*
             ovana le contrainte anle prof ampina mo zany ee manao $schedule[prof_id] de ovana ny contrainte anlery 
