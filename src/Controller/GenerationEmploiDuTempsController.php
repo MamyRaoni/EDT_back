@@ -57,7 +57,7 @@ class GenerationEmploiDuTempsController extends AbstractController
             // return $this->json([
             //     'message' => 'Emploi du temps généré avec succès!'
             // ], 200, []);
-            return $this->json(null, 200,[]);
+            return $this->json(['message'=> 'generation de l\'emploi du temps avec success'], 200);
         } 
         else {
             return $this->json([
@@ -79,7 +79,7 @@ class GenerationEmploiDuTempsController extends AbstractController
     public function regenerateContrainte(ContrainteSnapshotService $contrainteSnapshotService, ProfesseurRepository $professeurRepository){
         $contrainteSnapshotService->importContraintes($professeurRepository);
         return $this->json([
-            'message' => 'success of generation of table Contrainte',
+            'message' => 'regeneration des contraintes effectuer avec sucess',
         ], 200);
     }
     /**

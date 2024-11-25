@@ -38,7 +38,7 @@ class EmploiDuTempsService
                 continue;
             }
             
-            if($tour_matiere[$matiere_index] >= $matiere->getVolumeHoraire()){
+            if($tour_matiere[$matiere_index] > $matiere->getVolumeHoraire()){
                 continue;
             }
             foreach ($study_days as $day) {
@@ -50,8 +50,8 @@ class EmploiDuTempsService
                     $contraintes = $matiere->getProfesseur()->getContraintes();
                     $prof = $this->profAvailabilityService->findAvailableProf($day, $slot['heure_debut'], $slot['heure_fin'], $contraintes, $schedule);
                     if($prof){
-                        //$sallePrevue=$this->affectationSalleService->Affectation($salles,$classe,$tablEdt);
-                       
+                        $sallePrevue=$this->affectationSalleService->Affectation($salles,$classe,$tablEdt);
+                        if($sallePrevue){
                             $tour_matiere[$matiere_index]++;
                             $schedule[]=[
                                 'classe_id' => $classe->getId(),
@@ -64,7 +64,7 @@ class EmploiDuTempsService
                                 'jour' => $day,
                                 'heure_debut' => $slot['heure_debut'],
                                 'heure_fin' => $slot['heure_fin'],
-                                //'salle'=>$sallePrevue
+                                'salle'=>$sallePrevue->getNumero()
                             ];
                             if($this->generateTimetable($classe, $study_days, $schedule, $semestre, $tour_matiere,$salles,$tablEdt)){
                                 return true;
@@ -75,6 +75,8 @@ class EmploiDuTempsService
                             if ($matiere_index >= count($matieres) - 1) {
                                 return true; // Toutes les matières ont été traitées
                             }
+                        }    
+                            
                         
                         
                     }

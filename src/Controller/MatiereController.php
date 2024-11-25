@@ -65,7 +65,13 @@ class MatiereController extends AbstractController
             $matiere->setActivation($data['activation']);
         }
         if (isset($data['classe'])) {
+
             $classe = $classeRepository->find($data['classe']);
+            $classeRemove=$matiereRepository->find($id)->getClasse();
+            foreach($classeRemove as $classeDelete){
+                $matiere->removeClasse($classeDelete); 
+            }
+            
             $matiere->addClasse($classe);
         }
         if (isset($data['professeur'])) {

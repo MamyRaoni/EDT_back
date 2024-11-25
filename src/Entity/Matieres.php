@@ -153,6 +153,7 @@ class Matieres
 
         return $this;
     }
+    
 
     public function removeClasse(Classes $classe): static
     {
