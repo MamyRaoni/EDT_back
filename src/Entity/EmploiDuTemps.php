@@ -20,6 +20,9 @@ class EmploiDuTemps
     #[ORM\Column(type: Types::ARRAY)]
     private array $tableau = [];
 
+    #[ORM\Column(length: 255)]
+    private ?string $semestre = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,6 +48,18 @@ class EmploiDuTemps
     public function setTableau(array $tableau): static
     {
         $this->tableau = $tableau;
+
+        return $this;
+    }
+
+    public function getSemestre(): ?string
+    {
+        return $this->semestre;
+    }
+
+    public function setSemestre(string $semestre): static
+    {
+        $this->semestre = $semestre;
 
         return $this;
     }

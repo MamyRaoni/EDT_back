@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Matiere;
 use App\Entity\Matieres;
 use App\Repository\ClasseRepository;
 use App\Repository\MatiereRepository;

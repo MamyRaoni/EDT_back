@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Entity\Classes;
+use Symfony\Component\Console\Helper\Dumper;
 
 class EmploiDuTempsService
 {
@@ -22,25 +23,26 @@ class EmploiDuTempsService
         $this->affectationSalleService=$affectationSalleService;
     }
     // Logique principale, en utilisant les services injectés
-    public function generateTimetable(Classes $classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere = [],$salles,$tablEdt): bool
+    public function generateTimetable(Classes $classe, array $study_days, array &$schedule = [], string $semestre, array &$tour_matiere = [],$salles,$tablEdt,$testTour1,$matieres): bool
     {
         
-        $matieres = $classe->getMatieres()->toArray();
+        
         if (empty($tour_matiere)) {
             foreach ($matieres as $index => $matiere) {
-                $tour_matiere[$index] = $matiere->getVolumeHoraireRestant() ?? 0; // Assurez-vous d'initialiser avec une valeur valide
+                $tour_matiere[$index] = 1; // Assurez-vous d'initialiser avec une valeur valide
             }
         }
         for($matiere_index = 0; $matiere_index < count($matieres); $matiere_index++) {
             
             $matiere = $matieres[$matiere_index];
-            if ($matiere->getSemestre() != $semestre) {
-                continue;
-            }
             
-            if($tour_matiere[$matiere_index] > $matiere->getVolumeHoraire()){
-                continue;
+            if(($tour_matiere[$matiere_index]) == $matiere->getVolumeHoraire()+1  &&  $matiere==$matieres[count($matieres)-1 ]){
+                $tour_matiere[$matiere_index] --;
             }
+            if ($matiere->getSemestre() != $semestre) {continue;}
+            if($tour_matiere[$matiere_index] > $matiere->getVolumeHoraire()){continue;}
+            if(($matiere==$matieres[count($matieres)-1 ]) && ($testTour1[0]==false)){$tour_matiere[$matiere_index] ++;}
+            if(!($matiere->isActivation())){continue;}
             foreach ($study_days as $day) {
                 $slots = $this->slotService->getAvailableSlots($day);
                 foreach($slots as $slot){
@@ -53,6 +55,9 @@ class EmploiDuTempsService
                         $sallePrevue=$this->affectationSalleService->Affectation($salles,$classe,$tablEdt);
                         if($sallePrevue){
                             $tour_matiere[$matiere_index]++;
+                            if(($tour_matiere[$matiere_index]) == $matiere->getVolumeHoraire()+1 && $matiere==$matieres[count($matieres)-1 ]){
+                                $testTour1[0]=false;
+                            }
                             $schedule[]=[
                                 'classe_id' => $classe->getId(),
                                 'classe' => $classe->getLibelleClasse(),
@@ -66,7 +71,8 @@ class EmploiDuTempsService
                                 'heure_fin' => $slot['heure_fin'],
                                 'salle'=>$sallePrevue->getNumero()
                             ];
-                            if($this->generateTimetable($classe, $study_days, $schedule, $semestre, $tour_matiere,$salles,$tablEdt)){
+                            dump($schedule);
+                            if($this->generateTimetable($classe, $study_days, $schedule, $semestre, $tour_matiere,$salles,$tablEdt,$testTour1,$matieres)){
                                 return true;
                             }
 

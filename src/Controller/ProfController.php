@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Professeur;
 use App\Entity\Professeurs;
 use App\Repository\ProfesseurRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,7 +29,7 @@ class ProfController extends AbstractController
     #[Route('/api/prof', name: 'app_prof_create', methods:['POST'])]
     public function createProf(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
-        /* rehefa mandefa anle data de mba atao format json tsara be amzay tsy sahirana ny back XD */
+        
         $prof = $serializer->deserialize($request->getContent(), Professeurs::class, 'json');
         $em->persist($prof);
         $em->flush();
@@ -71,7 +70,7 @@ class ProfController extends AbstractController
     
         return $this->json($prof, 200, [], ['groups' => 'getProfesseur']);
     }
-    #[Route('/api/contrainte/prof/{id}', name: 'app_prof_detail', methods:['GET'])]
+    #[Route('/api/contrainte/prof/{id}', name: 'app_prof_contraint', methods:['GET'])]
     public function getDetailProfcontrainte(int $id, ProfesseurRepository $professeurRepository, SerializerInterface $serializer): JsonResponse
     {
         $prof = $professeurRepository->find($id);

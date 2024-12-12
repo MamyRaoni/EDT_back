@@ -26,8 +26,15 @@ class GenerationEmploiDuTempsController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $classes = $classeRepository->find($data['classe']);
         $salles= $salleRepository->findAll();
-        $semestre=$data['semestre']; // Remplir avec les données des classes
-        
+        $semestre=$data['semestre']; 
+        $Toutmatieres=$classes->getMatieres()->toArray();
+        $matieres=[];
+        foreach($Toutmatieres as $matiere){
+            if($matiere->getSemestre()==$semestre){
+                $matieres[]=$matiere;
+            }
+        }// Remplir avec les données des classes
+        //dd($matieres);
         $study_days = [
             '2024-03-18', // Lundi
             '2024-03-19', // Mardi
@@ -39,10 +46,11 @@ class GenerationEmploiDuTempsController extends AbstractController
         ]; 
         $schedule = [];
         $tour_matiere=[];
+        $testTour1=[true];
         $tablEdt=$emploiDuTempsRepository->findAll();
         //$success = $timetableService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere);
         $contrainteSnapshotService->exportContraintes();
-        $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere,$salles,$tablEdt);
+        $success = $emploiDuTempsService->generateTimetable($classes, $study_days,$schedule,$semestre,$tour_matiere,$salles,$tablEdt,$testTour1,$matieres);
         if ($success) {
             /*
             ovana le contrainte anle prof ampina mo zany ee manao $schedule[prof_id] de ovana ny contrainte anlery 
@@ -52,6 +60,7 @@ class GenerationEmploiDuTempsController extends AbstractController
             $edt=new EmploiDuTemps();
             $edt->setClasse($classes->getLibelleClasse());
             $edt->setTableau($schedule);
+            $edt->setSemestre($semestre);
             $em->persist($edt);
             $em->flush();
             // return $this->json([

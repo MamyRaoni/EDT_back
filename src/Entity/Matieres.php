@@ -142,8 +142,9 @@ class Matieres
      */
     public function getClasse(): Collection
     {
-        return $this->classe;
+        return $this->classe; 
     }
+
 
     public function addClasse(Classes $classe): static
     {
